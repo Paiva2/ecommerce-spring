@@ -1,10 +1,12 @@
 package ecommerce.http.controllers;
 
-import ecommerce.http.entities.Client;
-import ecommerce.http.services.ClientService;
 import java.util.Collections;
 import java.util.Map;
+import ecommerce.http.dtos.RegisterClientDto;
+import ecommerce.http.entities.Client;
+import ecommerce.http.services.ClientService;
 import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +24,10 @@ public class ClientController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> registerClient(@RequestBody Client registerClientDto) {
-        clientService.register(registerClientDto);
+    public Map<String, String> registerClient(
+            @RequestBody @Valid RegisterClientDto registerClientDto) {
+
+        clientService.register(registerClientDto.transformToClient());
 
         return Collections.singletonMap("message", "Registerd successfuly.");
     }

@@ -28,6 +28,14 @@ public class Client {
     @Nonnull
     private String password;
 
+    public Client() {}
+
+    public Client(String email, String name, String password) {
+        this.email = email;
+        this.name = name;
+        this.password = password;
+    }
+
     public void setId(UUID id) {
         this.id = id;
     }
@@ -52,4 +60,11 @@ public class Client {
         return this.password;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

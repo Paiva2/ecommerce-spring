@@ -2,11 +2,11 @@ package ecommerce.http.services;
 
 import java.util.Optional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 import ecommerce.http.entities.Client;
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.ConflictException;
 import ecommerce.http.repositories.ClientRepository;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ClientService {
