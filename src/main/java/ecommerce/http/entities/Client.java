@@ -1,6 +1,8 @@
 package ecommerce.http.entities;
 
 import java.util.UUID;
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -16,8 +18,14 @@ public class Client {
     @GeneratedValue(generator = "uuid2")
     @Id
     private UUID id;
-    private String name;
+
+    @Column(unique = true)
     private String email;
+
+    @Nonnull
+    private String name;
+
+    @Nonnull
     private String password;
 
     public void setId(UUID id) {
@@ -32,7 +40,16 @@ public class Client {
         this.email = email;
     }
 
+    public String getEmail() {
+        return this.email;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getPassword() {
+        return this.password;
+    }
+
 }
