@@ -1,0 +1,11 @@
+version: "2.23.3"
+
+services:
+  stock-system:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=local123
+      - POSTGRES_DB=postgres
