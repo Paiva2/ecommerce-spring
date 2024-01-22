@@ -6,16 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public class RegisterClientDto {
+public class AuthClientDto {
     @NotBlank(message = "email can't be empty")
     @NotNull(message = "email can't be null")
     @Email(message = "Invalid email")
     private String email;
-
-    @NotBlank(message = "name can't be empty")
-    @NotNull(message = "name can't be null")
-    @Size(min = 3, max = 100, message = "Must be of 3 - 100 characters")
-    private String name;
 
     @NotBlank(message = "password can't be empty")
     @NotNull(message = "password can't be null")
@@ -23,7 +18,7 @@ public class RegisterClientDto {
     private String password;
 
     public Client toClient() {
-        return new Client(name, email, password);
+        return new Client(email, password);
     }
 
     public String getEmail() {
@@ -32,14 +27,6 @@ public class RegisterClientDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getPassword() {

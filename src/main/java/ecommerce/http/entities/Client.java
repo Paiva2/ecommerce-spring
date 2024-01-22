@@ -1,38 +1,43 @@
 package ecommerce.http.entities;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
-import jakarta.annotation.Nonnull;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import ecommerce.http.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "clients")
-public class Client {
-    @SequenceGenerator(name = "client_sequence", sequenceName = "client_sequence",
-            allocationSize = 1)
-
-    @GeneratedValue(generator = "uuid2")
+public class Client implements UserDetails {
     @Id
+    @GeneratedValue(generator = "uuid2")
     private UUID id;
 
     @Column(unique = true)
     private String email;
 
-    @Nonnull
     private String name;
-
-    @Nonnull
     private String password;
+
+    private UserRole role = UserRole.USER;
 
     public Client() {}
 
-    public Client(String email, String name, String password) {
+    public Client(String name, String email, String password) {
         this.email = email;
         this.name = name;
+        this.password = password;
+    }
+
+    public Client(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
@@ -66,5 +71,48 @@ public class Client {
 
     public String getName() {
         return name;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (this.role == UserRole.ADMIN) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_USER"));
+        }
+
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
