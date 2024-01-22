@@ -7,6 +7,7 @@ import ecommerce.http.enums.UserRole;
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.ConflictException;
 import ecommerce.http.exceptions.NotAllowedException;
+import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.ClientRepository;
 import org.springframework.stereotype.Service;
 
@@ -59,5 +60,21 @@ public class ClientService {
         Client createdClient = this.studentRepository.save(client);
 
         return createdClient;
+    }
+
+    public void forgotPassword(Client client) {
+        if (client == null) {
+            throw new BadRequestException("Invalid client informations.");
+        }
+
+        String hashNewPassword = bcrypt.encode(client.getPassword());
+
+        client.setPassword(hashNewPassword);
+
+        int userUpdated = this.studentRepository.forgotPassword(hashNewPassword, client.getEmail());
+
+        if (userUpdated < 1) {
+            throw new NotFoundException("User not found.");
+        }
     }
 }

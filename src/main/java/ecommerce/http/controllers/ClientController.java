@@ -3,6 +3,7 @@ package ecommerce.http.controllers;
 import java.util.Collections;
 import java.util.Map;
 import ecommerce.http.dtos.AuthClientDto;
+import ecommerce.http.dtos.ForgotPasswordClientDto;
 import ecommerce.http.dtos.RegisterClientDto;
 import ecommerce.http.entities.Client;
 import ecommerce.http.services.ClientService;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -46,4 +48,12 @@ public class ClientController {
         return Collections.singletonMap("message", "Registerd successfuly.");
     }
 
+    @PatchMapping("/forgot-password")
+    public Map<String, String> forgotPassword(
+            @RequestBody @Valid ForgotPasswordClientDto forgotPasswordClientDto) {
+
+        clientService.forgotPassword(forgotPasswordClientDto.toClient());
+
+        return Collections.singletonMap("message", "Password successfully updated.");
+    }
 }
