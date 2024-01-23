@@ -54,6 +54,14 @@ public class Client implements UserDetails {
         this.password = password;
     }
 
+
+    public Client(UUID id, String name, String email, UserRole role) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.role = role;
+    }
+
     public void setId(UUID id) {
         this.id = id;
     }
