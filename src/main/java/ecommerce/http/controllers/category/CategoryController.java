@@ -2,10 +2,14 @@ package ecommerce.http.controllers.category;
 
 import java.util.Map;
 import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
 import org.springframework.http.ResponseEntity;
 import ecommerce.http.dtos.category.NewCategoryDto;
+import ecommerce.http.entities.Category;
 import ecommerce.http.services.category.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,5 +32,12 @@ public class CategoryController {
         this.categoryService.createCategory(categoryDto.toCategory());
 
         return ResponseEntity.status(201).body(Collections.singletonMap("message", "Category successfully created!"));
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<Category>> getAllCategories() {
+        List<Category> categories = this.categoryService.getAllCategories();
+
+        return ResponseEntity.ok().body(categories);
     }
 }

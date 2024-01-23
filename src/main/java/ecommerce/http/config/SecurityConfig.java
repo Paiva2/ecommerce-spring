@@ -25,6 +25,8 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/api/v1/clients/profile")
                                                 .authenticated()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/category/list")
+                                                .permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/category/*")
                                                 .hasRole("ADMIN").anyRequest().permitAll())
                                 .addFilterBefore(securityFilter,

@@ -7,6 +7,7 @@ import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.ConflictException;
 import ecommerce.http.repositories.CategoryRepository;
 import java.util.Optional;
+import java.util.List;
 
 @Service
 public class CategoryService {
@@ -34,5 +35,9 @@ public class CategoryService {
         Category newCategoryCreated = this.repository.save(categoryToCreate);
 
         return newCategoryCreated;
+    }
+
+    public List<Category> getAllCategories() {
+        return this.repository.findAllByOrderByName();
     }
 }
