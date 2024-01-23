@@ -40,10 +40,13 @@ public class Client implements UserDetails {
 
     public Client() {}
 
-    public Client(String name, String email, String password) {
+    public Client(String name, String email, String password, String privateQuestion,
+            String privateAnswer) {
         this.email = email;
         this.name = name;
         this.password = password;
+        this.privateQuestion = privateQuestion;
+        this.privateAnswer = privateAnswer;
     }
 
     public Client(String email, String password) {

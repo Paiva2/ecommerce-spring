@@ -18,6 +18,9 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
     @Query("SELECT c FROM Client c WHERE c.email = ?1")
     Optional<Client> findByEmail(String email);
 
+    @Query("SELECT c FROM Client c WHERE c.id = ?1")
+    UserDetails findByIdSecurity(UUID id);
+
     @Modifying
     @Transactional
     @Query("UPDATE Client c set c.password = ?1 where c.email = ?2")

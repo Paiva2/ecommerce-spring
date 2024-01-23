@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import ecommerce.http.entities.Client;
@@ -30,9 +31,22 @@ public class JwtService {
         }
     }
 
-    private Instant generateExpirationTime() {
-        ZoneOffset GMT_OFFSET = ZoneOffset.of("+0");
+    public String validateToken(String token) {
 
-        return LocalDateTime.now().plusHours(2).toInstant(GMT_OFFSET);
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+
+            JWTVerifier verifier = JWT.require(algorithm).withIssuer("ecommerce-api").build();
+
+            return verifier.verify(token.trim()).getSubject().toString();
+        } catch (JWTVerificationException exception) {
+            throw new RuntimeException("Invalid token...", exception);
+        }
+    }
+
+    private Instant generateExpirationTime() {
+        ZoneOffset OFFSET = ZoneOffset.of("-3");
+
+        return LocalDateTime.now().plusHours(3).toInstant(OFFSET);
     }
 }

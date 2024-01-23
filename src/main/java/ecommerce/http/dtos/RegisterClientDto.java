@@ -22,8 +22,16 @@ public class RegisterClientDto {
     @Size(min = 6, max = 9999, message = "password must have at least 6 characters")
     private String password;
 
+    @NotBlank(message = "privateQuestion can't be empty")
+    @NotNull(message = "privateQuestion can't be null")
+    private String privateQuestion;
+
+    @NotBlank(message = "privateAnswer can't be empty")
+    @NotNull(message = "privateAnswer can't be null")
+    private String privateAnswer;
+
     public Client toClient() {
-        return new Client(name, email, password);
+        return new Client(name, email, password, privateQuestion, privateAnswer);
     }
 
     public String getEmail() {
@@ -48,5 +56,21 @@ public class RegisterClientDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPrivateQuestion() {
+        return privateQuestion;
+    }
+
+    public void setPrivateQuestion(String privateQuestion) {
+        this.privateQuestion = privateQuestion;
+    }
+
+    public String getPrivateAnswer() {
+        return privateAnswer;
+    }
+
+    public void setPrivateAnswer(String privateAnswer) {
+        this.privateAnswer = privateAnswer;
     }
 }
