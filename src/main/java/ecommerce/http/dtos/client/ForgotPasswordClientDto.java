@@ -1,4 +1,4 @@
-package ecommerce.http.dtos;
+package ecommerce.http.dtos.client;
 
 import ecommerce.http.entities.Client;
 import jakarta.validation.constraints.Email;

@@ -35,10 +35,11 @@ public class Client implements UserDetails {
     @Column(nullable = false)
     private String privateAnswer;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = true)
     private UserRole role = UserRole.USER;
 
-    public Client() {}
+    public Client() {
+    }
 
     public Client(String name, String email, String password, String privateQuestion,
             String privateAnswer) {
@@ -53,7 +54,6 @@ public class Client implements UserDetails {
         this.email = email;
         this.password = password;
     }
-
 
     public Client(UUID id, String name, String email, UserRole role) {
         this.id = id;

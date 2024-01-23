@@ -1,4 +1,4 @@
-package ecommerce.http.services;
+package ecommerce.http.services.jwt;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

@@ -2,13 +2,13 @@ package ecommerce.http.repositories;
 
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import ecommerce.http.entities.Client;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
-import ecommerce.http.entities.Client;
 import jakarta.transaction.Transactional;
 
 @Primary

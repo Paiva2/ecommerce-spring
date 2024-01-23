@@ -9,8 +9,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.ClientRepository;
-import ecommerce.http.services.JwtService;
+import ecommerce.http.services.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +24,6 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Autowired
     private ClientRepository clientRepository;
-
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -38,8 +38,11 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             UserDetails user = clientRepository.findByIdSecurity(userId);
 
-            var authentication =
-                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            if (user == null) {
+                throw new NotFoundException("User not found.");
+            }
+
+            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

@@ -1,14 +1,16 @@
-package ecommerce.http.controllers;
+package ecommerce.http.controllers.client;
 
 import java.util.Collections;
 import java.util.Map;
-import ecommerce.http.dtos.AuthClientDto;
-import ecommerce.http.dtos.ForgotPasswordClientDto;
-import ecommerce.http.dtos.RegisterClientDto;
+
+import ecommerce.http.dtos.client.AuthClientDto;
+import ecommerce.http.dtos.client.ForgotPasswordClientDto;
+import ecommerce.http.dtos.client.RegisterClientDto;
 import ecommerce.http.entities.Client;
-import ecommerce.http.services.ClientService;
-import ecommerce.http.services.JwtService;
-import org.apache.catalina.connector.Response;
+import ecommerce.http.services.client.ClientService;
+import ecommerce.http.services.jwt.JwtService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
@@ -24,7 +26,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RestController
 @RequestMapping("/api/v1/clients")
 public class ClientController {
+    @Autowired
     private final ClientService clientService;
+
+    @Autowired
     private final JwtService jwtService;
 
     public ClientController(ClientService clientService, JwtService jwtService) {
@@ -50,7 +55,8 @@ public class ClientController {
 
         clientService.register(registerClientDto.toClient());
 
-        return ResponseEntity.status(201).body(Collections.singletonMap("message", "Registerd successfuly."))
+        return ResponseEntity.status(201)
+                .body(Collections.singletonMap("message", "Registerd successfuly."));
     }
 
     @PatchMapping("/forgot-password")

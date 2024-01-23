@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -26,17 +25,10 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/api/v1/clients/profile")
                                                 .authenticated()
-                                                .requestMatchers(HttpMethod.POST, "/api/v1/product")
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/category/*")
                                                 .hasRole("ADMIN").anyRequest().permitAll())
                                 .addFilterBefore(securityFilter,
                                                 UsernamePasswordAuthenticationFilter.class)
                                 .build();
-        }
-
-        @Bean
-        BCryptPasswordEncoder passwordEncoder() {
-                Integer SALT_ROUNDS = 6;
-
-                return new BCryptPasswordEncoder(SALT_ROUNDS);
         }
 }
