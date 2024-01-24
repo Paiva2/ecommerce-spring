@@ -27,6 +27,8 @@ public class SecurityConfig {
                                                 .authenticated()
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/category/list")
                                                 .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/product/{productId}")
+                                                .permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/category/*")
                                                 .hasRole("ADMIN").anyRequest().permitAll())
                                 .addFilterBefore(securityFilter,
