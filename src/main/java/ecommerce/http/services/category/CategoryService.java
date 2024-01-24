@@ -8,6 +8,10 @@ import ecommerce.http.exceptions.ConflictException;
 import ecommerce.http.repositories.CategoryRepository;
 import java.util.Optional;
 import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.UUID;
 
 @Service
 public class CategoryService {
@@ -37,7 +41,23 @@ public class CategoryService {
         return newCategoryCreated;
     }
 
-    public List<Category> getAllCategories() {
-        return this.repository.findAllByOrderByName();
+    public List<Map<String, String>> getAllCategories() {
+        List<Category> categories = this.repository.findAllByOrderByName();
+        List<Map<String, String>> formatCategories = new ArrayList<>();
+
+        categories.forEach(category -> {
+            Map<String, String> values = new LinkedHashMap<>();
+
+            values.put("id", category.getId().toString());
+            values.put("name", category.getName());
+
+            formatCategories.add(values);
+        });
+
+        return formatCategories;
+    }
+
+    public Optional<Category> filterCategoryById(UUID categoryId) {
+        return this.repository.findById(categoryId);
     }
 }

@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.util.UUID;
@@ -31,10 +30,15 @@ public class Category {
     @Column(nullable = true, name = "updated_at")
     private Instant updatedAt;
 
-    @OneToMany(mappedBy = "categoryId")
+    @OneToMany(mappedBy = "category_id")
     private List<Product> products;
 
     public Category() {
+    }
+
+    public Category(UUID id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public Category(String name) {
