@@ -39,14 +39,8 @@ public class InsertNewProductDto {
     private String categoryId;
 
     public Product toProduct() {
-        return new Product(this.name,
-                this.price,
-                this.priceOnSale,
-                this.description,
-                this.colors,
-                this.sizes,
-                this.isOnSale,
-                this.categoryId);
+        return new Product(this.name, this.price, this.priceOnSale, this.description, this.colors,
+                this.sizes, this.isOnSale, this.categoryId);
     }
 
     public String getName() {

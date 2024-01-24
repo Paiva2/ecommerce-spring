@@ -30,11 +30,10 @@ public class Category {
     @Column(nullable = true, name = "updated_at")
     private Instant updatedAt;
 
-    @OneToMany(mappedBy = "category_id")
+    @OneToMany(mappedBy = "category")
     private List<Product> products;
 
-    public Category() {
-    }
+    public Category() {}
 
     public Category(UUID id, String name) {
         this.id = id;

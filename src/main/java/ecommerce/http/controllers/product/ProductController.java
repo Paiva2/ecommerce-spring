@@ -3,15 +3,18 @@ package ecommerce.http.controllers.product;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ecommerce.http.dtos.product.InsertNewProductDto;
+import ecommerce.http.entities.Product;
 import ecommerce.http.services.product.ProductService;
 import java.util.Collections;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
@@ -36,11 +39,19 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<Map<String, String>> getById(
-            @PathVariable("productId") String pathVariable) {
+    public ResponseEntity<Product> getById(@PathVariable("productId") String pathVariable) {
 
-        Map<String, String> findProduct = this.productService.filterById(pathVariable);
+        Product findProduct = this.productService.filterById(pathVariable);
 
         return ResponseEntity.ok().body(findProduct);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<Product>> getAll(@RequestParam("page") Integer page,
+            @RequestParam("perPage") Integer perPage) {
+
+        Page<Product> getAllProducts = this.productService.listAllProducts(page, perPage);
+
+        return ResponseEntity.ok().body(getAllProducts);
     }
 }

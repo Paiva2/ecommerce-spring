@@ -2,6 +2,7 @@ package ecommerce.http.entities;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,12 +43,16 @@ public class Product {
     @Column(nullable = false, name = "is_on_sale")
     private Boolean isOnSale = false;
 
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(nullable = false, name = "category_id")
-    private Category category_id;
+    @JoinColumn(nullable = false, name = "category")
+    private Category category;
 
     @Transient
     private String categoryId;
+
+    @Transient
+    private String categoryName;
 
     @Column(nullable = false, name = "created_at")
     @CreationTimestamp
@@ -57,11 +62,37 @@ public class Product {
     @Column(nullable = false, name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Product() {
+    public Product() {}
+
+    // Repository
+    public Product(UUID id, String name, Double price, Double priceOnSale, String description,
+            String colors, String sizes, Boolean isOnSale) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.priceOnSale = priceOnSale;
+        this.description = description;
+        this.colors = colors;
+        this.sizes = sizes;
+        this.isOnSale = isOnSale;
     }
 
-    public Product(String name, Double price, Double priceOnSale, String description, String colors, String sizes,
-            Boolean isOnSale, String categoryId) {
+    // Creation
+    public Product(String name, Double price, Double priceOnSale, String description, String colors,
+            String sizes, Boolean isOnSale, Category category) {
+        this.name = name;
+        this.price = price;
+        this.priceOnSale = priceOnSale;
+        this.description = description;
+        this.colors = colors;
+        this.sizes = sizes;
+        this.isOnSale = isOnSale;
+        this.category = category;
+    }
+
+    // Dto
+    public Product(String name, Double price, Double priceOnSale, String description, String colors,
+            String sizes, Boolean isOnSale, String categoryId) {
         this.name = name;
         this.price = price;
         this.priceOnSale = priceOnSale;
@@ -70,18 +101,6 @@ public class Product {
         this.sizes = sizes;
         this.isOnSale = isOnSale;
         this.categoryId = categoryId;
-    }
-
-    public Product(String name, Double price, Double priceOnSale, String description, String colors, String sizes,
-            Boolean isOnSale, Category category_id) {
-        this.name = name;
-        this.price = price;
-        this.priceOnSale = priceOnSale;
-        this.description = description;
-        this.colors = colors;
-        this.sizes = sizes;
-        this.isOnSale = isOnSale;
-        this.category_id = category_id;
     }
 
     public UUID getId() {
@@ -165,11 +184,11 @@ public class Product {
     }
 
     public Category getCategory() {
-        return category_id;
+        return category;
     }
 
-    public void setCategory(Category category_id) {
-        this.category_id = category_id;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public String getCategoryId() {
@@ -180,4 +199,11 @@ public class Product {
         this.categoryId = categoryId;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }

@@ -1,11 +1,12 @@
 package ecommerce.http.services.product;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Map;
-import java.util.LinkedHashMap;
 import ecommerce.http.entities.Category;
 import ecommerce.http.entities.Product;
 import ecommerce.http.exceptions.BadRequestException;
@@ -45,7 +46,7 @@ public class ProductService {
         return productCreated;
     }
 
-    public Map<String, String> filterById(String productId) {
+    public Product filterById(String productId) {
         if (productId == null) {
             throw new BadRequestException("Invalid categoryId");
         }
@@ -64,19 +65,32 @@ public class ProductService {
 
         Product findProduct = getProduct.get();
 
-        Map<String, String> productObject = new LinkedHashMap<>();
+        findProduct.setCategoryId(String.valueOf(findProduct.getCategory().getId()));
+        findProduct.setCategoryName(findProduct.getCategory().getName());
 
-        productObject.put("id", findProduct.getId().toString());
-        productObject.put("name", findProduct.getName());
-        productObject.put("description", findProduct.getDescription());
-        productObject.put("colors", findProduct.getColors());
-        productObject.put("sizes", findProduct.getSizes());
-        productObject.put("isOnSale", findProduct.getIsOnSale().toString());
-        productObject.put("price", findProduct.getPrice().toString());
-        productObject.put("priceOnSale",
-                findProduct.getPriceOnSale() != null ? findProduct.getPriceOnSale().toString() : "");
-        productObject.put("categoryName", findProduct.getCategory().getName());
+        return findProduct;
+    }
 
-        return productObject;
+    public Page<Product> listAllProducts(Integer pageNumber, Integer perPage) {
+        if (pageNumber == null || pageNumber < 0) {
+            pageNumber = 1;
+        }
+
+        if (perPage == null || perPage < 5) {
+            perPage = 5;
+        }
+
+        Pageable pageable = PageRequest.of((pageNumber - 1), perPage);
+
+        Page<Product> productList = this.repository.findAll(pageable);
+
+        productList.forEach(product -> {
+            if (product.getCategory() != null) {
+                product.setCategoryId(String.valueOf(product.getCategory().getId()));
+                product.setCategoryName(product.getCategory().getName());
+            }
+        });
+
+        return productList;
     }
 }
