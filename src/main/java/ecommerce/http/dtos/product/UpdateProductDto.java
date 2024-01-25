@@ -1,47 +1,46 @@
 package ecommerce.http.dtos.product;
 
 import ecommerce.http.entities.Product;
+import java.util.UUID;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 
-public class InsertNewProductDto {
-    @NotBlank(message = "name can't be empty.")
-    @NotNull(message = "name can't be null")
+public class UpdateProductDto {
+    @Null
+    private UUID id;
+
     @Size(min = 3, message = "name must have at least 3 characters.")
     private String name;
 
-    @NotNull(message = "price can't be null.")
     @DecimalMin(value = "0.1", message = "price must be greater than or equal to 1")
     private Double price;
 
     @DecimalMin(value = "0.1", message = "priceOnSale must be greater than or equal to 0.1")
     private Double priceOnSale;
 
-    @NotBlank(message = "description can't be empty.")
-    @NotNull(message = "description can't be null.")
     @Size(min = 10, message = "description must have at least 10 characters.")
     private String description;
 
-    @NotBlank(message = "colors can't be empty.")
-    @NotNull(message = "colors can't be null.")
     private String colors;
 
-    @NotBlank(message = "sizes can't be empty.")
-    @NotNull(message = "sizes can't be null.")
     private String sizes;
 
-    @NotNull(message = "isOnSale can't be null.")
     private Boolean isOnSale;
 
-    @NotBlank(message = "categoryId can't be empty.")
-    @NotNull(message = "categoryId can't be null.")
     private String categoryId;
 
-    public Product toProduct() {
-        return new Product(this.name, this.price, this.priceOnSale, this.description, this.colors,
-                this.sizes, this.isOnSale, this.categoryId);
+    public Product toProduct(UUID productId) {
+        return new Product(productId, this.name, this.price, this.priceOnSale, this.description,
+                this.colors, this.sizes, this.isOnSale, this.categoryId);
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -107,4 +106,14 @@ public class InsertNewProductDto {
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
     }
+
+    @Override
+    public String toString() {
+        return "UpdateProductDto [id=" + id + ", name=" + name + ", price=" + price
+                + ", priceOnSale=" + priceOnSale + ", description=" + description + ", colors="
+                + colors + ", sizes=" + sizes + ", isOnSale=" + isOnSale + ", categoryId="
+                + categoryId + "]";
+    }
+
+
 }

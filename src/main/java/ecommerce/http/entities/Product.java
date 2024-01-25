@@ -1,6 +1,7 @@
 package ecommerce.http.entities;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
@@ -17,35 +18,36 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
+@DynamicUpdate(true)
 public class Product {
     @Id
     @GeneratedValue(generator = "uuid2")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column()
     private String name;
 
-    @Column(nullable = false)
+    @Column()
     private Double price;
 
     @Column(nullable = true, name = "price_on_sale")
     private Double priceOnSale;
 
-    @Column(nullable = false)
+    @Column()
     private String description;
 
-    @Column(nullable = false)
+    @Column()
     private String colors;
 
-    @Column(nullable = false)
+    @Column()
     private String sizes;
 
-    @Column(nullable = false, name = "is_on_sale")
+    @Column(name = "is_on_sale")
     private Boolean isOnSale = false;
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(nullable = false, name = "category")
+    @JoinColumn(name = "category")
     private Category category;
 
     @Transient
@@ -54,12 +56,12 @@ public class Product {
     @Transient
     private String categoryName;
 
-    @Column(nullable = false, name = "created_at")
     @CreationTimestamp
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false, name = "updated_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     public Product() {}
@@ -77,7 +79,7 @@ public class Product {
         this.isOnSale = isOnSale;
     }
 
-    // Creation
+    // Creation default
     public Product(String name, Double price, Double priceOnSale, String description, String colors,
             String sizes, Boolean isOnSale, Category category) {
         this.name = name;
@@ -90,9 +92,23 @@ public class Product {
         this.category = category;
     }
 
-    // Dto
+    // Creation DTO
     public Product(String name, Double price, Double priceOnSale, String description, String colors,
             String sizes, Boolean isOnSale, String categoryId) {
+        this.name = name;
+        this.price = price;
+        this.priceOnSale = priceOnSale;
+        this.description = description;
+        this.colors = colors;
+        this.sizes = sizes;
+        this.isOnSale = isOnSale;
+        this.categoryId = categoryId;
+    }
+
+    // Update DTO
+    public Product(UUID id, String name, Double price, Double priceOnSale, String description,
+            String colors, String sizes, Boolean isOnSale, String categoryId) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.priceOnSale = priceOnSale;
@@ -206,4 +222,15 @@ public class Product {
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
+
+    @Override
+    public String toString() {
+        return "Product [id=" + id + ", name=" + name + ", price=" + price + ", priceOnSale="
+                + priceOnSale + ", description=" + description + ", colors=" + colors + ", sizes="
+                + sizes + ", isOnSale=" + isOnSale + ", category=" + category + ", categoryId="
+                + categoryId + ", categoryName=" + categoryName + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt + "]";
+    }
+
+
 }

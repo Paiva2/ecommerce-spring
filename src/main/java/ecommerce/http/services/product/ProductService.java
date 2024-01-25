@@ -1,10 +1,11 @@
 package ecommerce.http.services.product;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 import ecommerce.http.entities.Category;
@@ -13,6 +14,7 @@ import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.ProductRepository;
 import ecommerce.http.services.category.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductService {
@@ -92,5 +94,32 @@ public class ProductService {
         });
 
         return productList;
+    }
+
+    public Product editProduct(Product product) {
+        if (product == null) {
+            throw new BadRequestException("Product can't be null.");
+        }
+
+        if (product.getCategoryId() != null) {
+            Optional<Category> getCategory = this.categoryService
+                    .filterCategoryById(UUID.fromString(product.getCategoryId()));
+
+            if (!getCategory.isPresent()) {
+                throw new NotFoundException("New category not found.");
+            }
+
+            product.setCategory(getCategory.get());
+        }
+
+        Optional<Product> getProductBefore = this.repository.findById(product.getId());
+
+        if (!getProductBefore.isPresent()) {
+            throw new NotFoundException("Product not found.");
+        }
+
+        Product editProduct = this.repository.save(product);
+
+        return editProduct;
     }
 }
