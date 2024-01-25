@@ -1,8 +1,10 @@
 package ecommerce.http.services.product;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.BeanWrapperImpl;
+import java.beans.PropertyDescriptor;
+import org.springframework.beans.BeanWrapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +16,6 @@ import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.ProductRepository;
 import ecommerce.http.services.category.CategoryService;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductService {
@@ -118,7 +119,29 @@ public class ProductService {
             throw new NotFoundException("Product not found.");
         }
 
-        Product editProduct = this.repository.save(product);
+        BeanWrapper refUpdate = new BeanWrapperImpl(product);
+
+        BeanWrapper refSource = new BeanWrapperImpl(getProductBefore.get());
+
+        PropertyDescriptor[] propertiesToUpdate = refUpdate.getPropertyDescriptors();
+
+        for (PropertyDescriptor field : propertiesToUpdate) {
+            String fieldName = field.getName();
+            Object fieldValue = refUpdate.getPropertyValue(field.getName());
+
+            Boolean updatableField = fieldName.hashCode() != "class".hashCode()
+                    && fieldName.hashCode() != "id".hashCode();
+
+            if (fieldValue != null && updatableField) {
+                refSource.setPropertyValue(fieldName, fieldValue);
+            }
+        }
+
+        Product editProduct = this.repository.save(getProductBefore.get());
+
+        editProduct.setCategoryId(editProduct.getCategory().getId().toString());
+
+        editProduct.setCategoryName(editProduct.getCategory().getName());
 
         return editProduct;
     }

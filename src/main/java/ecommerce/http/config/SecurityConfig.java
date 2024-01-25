@@ -25,11 +25,17 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/api/v1/clients/profile")
                                                 .authenticated()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/category/list")
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/v1/category/list")
                                                 .permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/product/{productId}")
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/v1/product/{productId}")
                                                 .permitAll()
-                                                .requestMatchers(HttpMethod.POST, "/api/v1/category/*")
+                                                .requestMatchers(HttpMethod.PATCH,
+                                                                "/api/v1/product/*")
+                                                .hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.POST,
+                                                                "/api/v1/category/*")
                                                 .hasRole("ADMIN").anyRequest().permitAll())
                                 .addFilterBefore(securityFilter,
                                                 UsernamePasswordAuthenticationFilter.class)
