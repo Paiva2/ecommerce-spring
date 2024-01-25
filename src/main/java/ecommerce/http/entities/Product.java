@@ -45,6 +45,9 @@ public class Product {
     @Column(name = "is_on_sale")
     private Boolean isOnSale = false;
 
+    @Column(name = "active")
+    private Boolean active = true;
+
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "category")
@@ -68,7 +71,7 @@ public class Product {
 
     // Repository
     public Product(UUID id, String name, Double price, Double priceOnSale, String description,
-            String colors, String sizes, Boolean isOnSale) {
+            String colors, String sizes, Boolean isOnSale, Boolean active) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -77,6 +80,7 @@ public class Product {
         this.colors = colors;
         this.sizes = sizes;
         this.isOnSale = isOnSale;
+        this.active = active;
     }
 
     // Creation default
@@ -107,7 +111,7 @@ public class Product {
 
     // Update DTO
     public Product(UUID id, String name, Double price, Double priceOnSale, String description,
-            String colors, String sizes, Boolean isOnSale, String categoryId) {
+            String colors, String sizes, Boolean isOnSale, String categoryId, Boolean active) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -117,6 +121,7 @@ public class Product {
         this.sizes = sizes;
         this.isOnSale = isOnSale;
         this.categoryId = categoryId;
+        this.active = active;
     }
 
     public UUID getId() {
@@ -223,14 +228,11 @@ public class Product {
         this.categoryName = categoryName;
     }
 
-    @Override
-    public String toString() {
-        return "Product [id=" + id + ", name=" + name + ", price=" + price + ", priceOnSale="
-                + priceOnSale + ", description=" + description + ", colors=" + colors + ", sizes="
-                + sizes + ", isOnSale=" + isOnSale + ", category=" + category + ", categoryId="
-                + categoryId + ", categoryName=" + categoryName + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt + "]";
+    public Boolean getActive() {
+        return active;
     }
 
-
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 }

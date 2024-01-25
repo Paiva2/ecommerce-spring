@@ -28,11 +28,13 @@ public class UpdateProductDto {
 
     private Boolean isOnSale;
 
+    private Boolean active;
+
     private String categoryId;
 
     public Product toProduct(UUID productId) {
         return new Product(productId, this.name, this.price, this.priceOnSale, this.description,
-                this.colors, this.sizes, this.isOnSale, this.categoryId);
+                this.colors, this.sizes, this.isOnSale, this.categoryId, this.active);
     }
 
     public UUID getId() {
@@ -107,13 +109,11 @@ public class UpdateProductDto {
         this.categoryId = categoryId;
     }
 
-    @Override
-    public String toString() {
-        return "UpdateProductDto [id=" + id + ", name=" + name + ", price=" + price
-                + ", priceOnSale=" + priceOnSale + ", description=" + description + ", colors="
-                + colors + ", sizes=" + sizes + ", isOnSale=" + isOnSale + ", categoryId="
-                + categoryId + "]";
+    public Boolean getActive() {
+        return active;
     }
 
-
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 }

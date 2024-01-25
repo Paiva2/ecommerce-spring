@@ -74,7 +74,7 @@ public class ProductService {
         return findProduct;
     }
 
-    public Page<Product> listAllProducts(Integer pageNumber, Integer perPage) {
+    public Page<Product> listAllProducts(Boolean active, Integer pageNumber, Integer perPage) {
         if (pageNumber == null || pageNumber < 0) {
             pageNumber = 1;
         }
@@ -85,7 +85,14 @@ public class ProductService {
 
         Pageable pageable = PageRequest.of((pageNumber - 1), perPage);
 
-        Page<Product> productList = this.repository.findAll(pageable);
+        Page<Product> productList;
+
+        if (active != null) {
+            productList = this.repository.findAllByStatus(active, pageable);
+
+        } else {
+            productList = this.repository.findAll(pageable);
+        }
 
         productList.forEach(product -> {
             if (product.getCategory() != null) {
@@ -144,5 +151,17 @@ public class ProductService {
         editProduct.setCategoryName(editProduct.getCategory().getName());
 
         return editProduct;
+    }
+
+    public void deleteAProduct(UUID productId) {
+        if (productId == null) {
+            throw new BadRequestException("Invalid product.");
+        }
+
+        int productDeleted = this.repository.delete(productId);
+
+        if (productDeleted == 0) {
+            throw new NotFoundException("Product not found.");
+        }
     }
 }
