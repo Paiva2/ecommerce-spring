@@ -9,8 +9,8 @@ import jakarta.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.util.UUID;
-import java.util.List;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "categories")
@@ -83,4 +83,7 @@ public class Category {
     public void setProducts(List<Product> products) {
         this.products = products;
     }
+
+
+
 }

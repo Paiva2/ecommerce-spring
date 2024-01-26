@@ -6,15 +6,21 @@ import org.springframework.beans.BeanWrapperImpl;
 import java.beans.PropertyDescriptor;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import ecommerce.http.entities.Category;
 import ecommerce.http.entities.Product;
+import ecommerce.http.entities.ProductSku;
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.ProductRepository;
+import ecommerce.http.repositories.ProductSkuRepository;
 import ecommerce.http.services.category.CategoryService;
 
 @Service
@@ -25,12 +31,17 @@ public class ProductService {
     @Autowired
     private final CategoryService categoryService;
 
-    public ProductService(ProductRepository productRepository, CategoryService categoryService) {
+    @Autowired
+    private final ProductSkuRepository productSkuRepository;
+
+    public ProductService(ProductRepository productRepository, CategoryService categoryService,
+            ProductSkuRepository productSkuRepository) {
         this.repository = productRepository;
         this.categoryService = categoryService;
+        this.productSkuRepository = productSkuRepository;
     }
 
-    public Product insertProduct(Product newProduct) {
+    public Product insertProduct(Product newProduct, @NonNull ProductSku firstSku) {
         if (newProduct == null) {
             throw new BadRequestException("Invalid new product schema.");
         }
@@ -42,9 +53,18 @@ public class ProductService {
             throw new NotFoundException("Product category doesn't exists.");
         }
 
+
         newProduct.setCategory(doesCategoryExists.get());
 
+        Set<ProductSku> productSku = new HashSet<>();
+
+        productSku.add(firstSku);
+
         Product productCreated = this.repository.save(newProduct);
+
+        firstSku.setProduct(productCreated);
+
+        this.productSkuRepository.save(firstSku);
 
         return productCreated;
     }
@@ -74,7 +94,8 @@ public class ProductService {
         return findProduct;
     }
 
-    public Page<Product> listAllProducts(Boolean active, Integer pageNumber, Integer perPage) {
+    public Page<Product> listAllProducts(Boolean active, Integer pageNumber, Integer perPage,
+            String colors, String categoryName) {
         if (pageNumber == null || pageNumber < 0) {
             pageNumber = 1;
         }
@@ -85,14 +106,15 @@ public class ProductService {
 
         Pageable pageable = PageRequest.of((pageNumber - 1), perPage);
 
-        Page<Product> productList;
+        Page<Product> productList = this.repository.findAll(pageable);
 
-        if (active != null) {
-            productList = this.repository.findAllByStatus(active, pageable);
-
-        } else {
-            productList = this.repository.findAll(pageable);
-        }
+        /*
+         * if (active != null) { productList = this.repository.findAllByStatus(active, pageable); }
+         * else if (colors != null) { productList = this.repository.findAllByColor(colors,
+         * pageable); } else if (categoryName != null) { productList =
+         * this.repository.findByCategory(categoryName, pageable); } else { productList =
+         * this.repository.findAll(pageable); }
+         */
 
         productList.forEach(product -> {
             if (product.getCategory() != null) {

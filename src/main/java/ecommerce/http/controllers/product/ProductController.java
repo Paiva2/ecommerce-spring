@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import ecommerce.http.dtos.product.InsertNewProductDto;
 import ecommerce.http.dtos.product.UpdateProductDto;
 import ecommerce.http.entities.Product;
@@ -36,7 +37,9 @@ public class ProductController {
     @PostMapping("/insert")
     public ResponseEntity<Map<String, String>> insertNewProduct(
             @RequestBody @Valid InsertNewProductDto insertNewProductDto) {
-        this.productService.insertProduct(insertNewProductDto.toProduct());
+
+        this.productService.insertProduct(insertNewProductDto.toProduct(),
+                insertNewProductDto.toProductSku());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap("message", "Product inserted successfully."));
@@ -54,23 +57,28 @@ public class ProductController {
     public ResponseEntity<Page<Product>> getAll(
             @RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "perPage", required = false) Integer perPage,
-            @RequestParam(name = "active", required = false) Boolean active) {
+            @RequestParam(name = "active", required = false) Boolean active,
+            @RequestParam(name = "color", required = false) String colors,
+            @RequestParam(name = "category", required = false) String categoryName) {
 
-        Page<Product> getAllProducts = this.productService.listAllProducts(active, page, perPage);
+        Page<Product> getAllProducts =
+                this.productService.listAllProducts(active, page, perPage, colors, categoryName);
 
         return ResponseEntity.ok().body(getAllProducts);
     }
 
-    @PatchMapping("/{productId}")
-    public ResponseEntity<Product> updateProduct(
-            @RequestBody @Valid UpdateProductDto updateProductDto,
-            @PathVariable("productId") UUID productId) {
-
-        Product editedProduct =
-                this.productService.editProduct(updateProductDto.toProduct(productId));
-
-        return ResponseEntity.ok().body(editedProduct);
-    }
+    /*
+     * @PatchMapping("/{productId}") public ResponseEntity<Product> updateProduct(
+     * 
+     * @RequestBody @Valid UpdateProductDto updateProductDto,
+     * 
+     * @PathVariable("productId") UUID productId) {
+     * 
+     * Product editedProduct =
+     * this.productService.editProduct(updateProductDto.toProduct(productId));
+     * 
+     * return ResponseEntity.ok().body(editedProduct); }
+     */
 
     @DeleteMapping("/delete/{productId}")
     public ResponseEntity<Map<String, String>> deleteProduct(

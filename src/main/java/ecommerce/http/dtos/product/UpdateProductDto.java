@@ -31,11 +31,11 @@ public class UpdateProductDto {
     private Boolean active;
 
     private String categoryId;
-
-    public Product toProduct(UUID productId) {
-        return new Product(productId, this.name, this.price, this.priceOnSale, this.description,
-                this.colors, this.sizes, this.isOnSale, this.categoryId, this.active);
-    }
+    /*
+     * public Product toProduct(UUID productId) { return new Product(productId, this.name,
+     * this.price, this.priceOnSale, this.description, this.colors, this.sizes, this.isOnSale,
+     * this.categoryId, this.active); }
+     */
 
     public UUID getId() {
         return id;

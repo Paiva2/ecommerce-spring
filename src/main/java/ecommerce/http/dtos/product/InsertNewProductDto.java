@@ -1,7 +1,10 @@
 package ecommerce.http.dtos.product;
 
+import java.math.BigDecimal;
 import ecommerce.http.entities.Product;
+import ecommerce.http.entities.ProductSku;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,36 +15,37 @@ public class InsertNewProductDto {
     @Size(min = 3, message = "name must have at least 3 characters.")
     private String name;
 
-    @NotNull(message = "price can't be null.")
-    @DecimalMin(value = "0.1", message = "price must be greater than or equal to 1")
-    private Double price;
-
-    @DecimalMin(value = "0.1", message = "priceOnSale must be greater than or equal to 0.1")
-    private Double priceOnSale;
-
     @NotBlank(message = "description can't be empty.")
     @NotNull(message = "description can't be null.")
     @Size(min = 10, message = "description must have at least 10 characters.")
     private String description;
 
-    @NotBlank(message = "colors can't be empty.")
-    @NotNull(message = "colors can't be null.")
-    private String colors;
-
-    @NotBlank(message = "sizes can't be empty.")
-    @NotNull(message = "sizes can't be null.")
-    private String sizes;
-
-    @NotNull(message = "isOnSale can't be null.")
-    private Boolean isOnSale;
-
     @NotBlank(message = "categoryId can't be empty.")
     @NotNull(message = "categoryId can't be null.")
     private String categoryId;
 
+    @NotBlank(message = "color can't be empty.")
+    @NotNull(message = "color can't be null.")
+    private String color;
+
+    @NotBlank(message = "size can't be empty.")
+    @NotNull(message = "size can't be null.")
+    private String size;
+
+    @NotNull(message = "price can't be null.")
+    @DecimalMin(value = "0.01")
+    private BigDecimal price;
+
+    @NotNull(message = "quantity can't be null.")
+    @Min(value = 1)
+    private Integer quantity;
+
     public Product toProduct() {
-        return new Product(this.name, this.price, this.priceOnSale, this.description, this.colors,
-                this.sizes, this.isOnSale, this.categoryId);
+        return new Product(this.name, this.description, this.categoryId);
+    }
+
+    public ProductSku toProductSku() {
+        return new ProductSku(this.color, this.size, this.price, this.quantity);
     }
 
     public String getName() {
@@ -52,22 +56,6 @@ public class InsertNewProductDto {
         this.name = name;
     }
 
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public Double getPriceOnSale() {
-        return priceOnSale;
-    }
-
-    public void setPriceOnSale(Double priceOnSale) {
-        this.priceOnSale = priceOnSale;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -76,35 +64,43 @@ public class InsertNewProductDto {
         this.description = description;
     }
 
-    public String getColors() {
-        return colors;
-    }
-
-    public void setColors(String colors) {
-        this.colors = colors;
-    }
-
-    public String getSizes() {
-        return sizes;
-    }
-
-    public void setSizes(String sizes) {
-        this.sizes = sizes;
-    }
-
-    public Boolean getIsOnSale() {
-        return isOnSale;
-    }
-
-    public void setIsOnSale(Boolean isOnSale) {
-        this.isOnSale = isOnSale;
-    }
-
     public String getCategoryId() {
         return categoryId;
     }
 
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }
