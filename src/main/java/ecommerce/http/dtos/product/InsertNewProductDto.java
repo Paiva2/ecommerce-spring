@@ -1,9 +1,13 @@
 package ecommerce.http.dtos.product;
 
 import java.math.BigDecimal;
+import ecommerce.http.entities.Category;
 import ecommerce.http.entities.Product;
 import ecommerce.http.entities.ProductSku;
 import ecommerce.http.enums.Gender;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.UUID;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -45,11 +49,24 @@ public class InsertNewProductDto {
     private Gender gender;
 
     public Product toProduct() {
-        return new Product(this.name, this.description, this.categoryId);
+        Product newProduct = new Product(this.name, this.description, this.categoryId);
+        Set<ProductSku> skus = new HashSet<>();
+
+        skus.add(this.productSkuBuilder());
+
+        newProduct.setSkus(skus);
+        newProduct.setCategory(this.productCategoryBuilder());
+        newProduct.getCategory().setId(UUID.fromString(this.categoryId));
+
+        return newProduct;
     }
 
-    public ProductSku toProductSku() {
+    public ProductSku productSkuBuilder() {
         return new ProductSku(this.color, this.size, this.price, this.quantity, this.gender);
+    }
+
+    public Category productCategoryBuilder() {
+        return new Category();
     }
 
     public String getName() {

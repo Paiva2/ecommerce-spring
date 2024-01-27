@@ -1,10 +1,10 @@
 package ecommerce.http.repositories;
 
 import jakarta.persistence.PersistenceContext;
+import org.springframework.stereotype.Component;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 import ecommerce.http.entities.Category;
 import ecommerce.http.entities.Product;
 import ecommerce.http.entities.ProductSku;
@@ -23,7 +23,8 @@ public class ProductRepositoryCustom {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ProductRepositoryCustom() {}
+    public ProductRepositoryCustom() {
+    }
 
     public Page<Product> dynamicQuery(String productName, String color, String size,
             String categoryName, Boolean active, Integer page, Integer perPage) {

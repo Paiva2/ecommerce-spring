@@ -3,9 +3,7 @@ package ecommerce.http.entities;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.CascadeType;
 import java.util.Set;
 import java.util.UUID;
@@ -35,16 +33,9 @@ public class Product {
     @Column(name = "active")
     private Boolean active = true;
 
-    @JsonIgnore
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "category_id")
     private Category category;
-
-    @Transient
-    private String categoryId;
-
-    @Transient
-    private String categoryName;
 
     @OneToMany(mappedBy = "product")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -64,7 +55,6 @@ public class Product {
     public Product(String name, String description, String categoryId) {
         this.name = name;
         this.description = description;
-        this.categoryId = categoryId;
     }
 
     // Update DTO
@@ -72,7 +62,6 @@ public class Product {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.categoryId = categoryId;
         this.active = active;
     }
 
@@ -128,22 +117,6 @@ public class Product {
 
     public void setCategory(Category category) {
         this.category = category;
-    }
-
-    public String getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
     }
 
     public Boolean getActive() {

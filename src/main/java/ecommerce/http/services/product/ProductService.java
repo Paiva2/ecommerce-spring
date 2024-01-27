@@ -2,7 +2,6 @@ package ecommerce.http.services.product;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.lang.NonNull;
 import org.springframework.beans.BeanWrapperImpl;
 import java.beans.PropertyDescriptor;
 import org.springframework.beans.BeanWrapper;
@@ -14,11 +13,9 @@ import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.ProductRepository;
 import ecommerce.http.repositories.ProductRepositoryCustom;
-import ecommerce.http.repositories.ProductSkuRepository;
+import ecommerce.http.services.ProductSku.ProductSkuService;
 import ecommerce.http.services.category.CategoryService;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -34,41 +31,42 @@ public class ProductService {
     private final CategoryService categoryService;
 
     @Autowired
-    private final ProductSkuRepository productSkuRepository;
+    private final ProductSkuService productSkuService;
 
     public ProductService(ProductRepository productRepository, CategoryService categoryService,
-            ProductSkuRepository productSkuRepository,
-            ProductRepositoryCustom productRepositoryCustom) {
+            ProductSkuService productSkuService, ProductRepositoryCustom productRepositoryCustom) {
         this.repository = productRepository;
         this.categoryService = categoryService;
-        this.productSkuRepository = productSkuRepository;
+        this.productSkuService = productSkuService;
         this.productRepositoryCustom = productRepositoryCustom;
     }
 
-    public Product insertProduct(Product newProduct, @NonNull ProductSku firstSku) {
+    public Product insertProduct(Product newProduct) {
         if (newProduct == null) {
             throw new BadRequestException("Invalid new product schema.");
         }
 
         Optional<Category> doesCategoryExists = this.categoryService
-                .filterCategoryById(UUID.fromString(newProduct.getCategoryId()));
+                .filterCategoryById(newProduct.getCategory().getId());
 
         if (!doesCategoryExists.isPresent()) {
             throw new NotFoundException("Product category doesn't exists.");
         }
 
-
         newProduct.setCategory(doesCategoryExists.get());
-
-        Set<ProductSku> productSku = new HashSet<>();
-
-        productSku.add(firstSku);
 
         Product productCreated = this.repository.save(newProduct);
 
-        firstSku.setProduct(productCreated);
+        ProductSku productSku = newProduct.getSkus().stream().toList().get(0);
 
-        this.productSkuRepository.save(firstSku);
+        if (productSku == null) {
+            throw new BadRequestException(
+                    "You need to insert at least one sku while creating a new product.");
+        }
+
+        productSku.setProduct(productCreated);
+
+        this.productSkuService.insertNewSku(productSku);
 
         return productCreated;
     }
@@ -92,12 +90,8 @@ public class ProductService {
 
         Product findProduct = getProduct.get();
 
-        findProduct.setCategoryId(String.valueOf(findProduct.getCategory().getId()));
-        findProduct.setCategoryName(findProduct.getCategory().getName());
-
         return findProduct;
     }
-
 
     public Page<Product> listAllProducts(Integer pageNumber, Integer perPage, Boolean active,
             String name, String categoryName, String color, String size) {
@@ -112,13 +106,6 @@ public class ProductService {
         Page<Product> productList = this.productRepositoryCustom.dynamicQuery(name, color, size,
                 categoryName, active, pageNumber, perPage);
 
-        productList.forEach(product -> {
-            if (product.getCategory() != null) {
-                product.setCategoryId(String.valueOf(product.getCategory().getId()));
-                product.setCategoryName(product.getCategory().getName());
-            }
-        });
-
         return productList;
     }
 
@@ -127,9 +114,8 @@ public class ProductService {
             throw new BadRequestException("Product can't be null.");
         }
 
-        if (product.getCategoryId() != null) {
-            Optional<Category> getCategory = this.categoryService
-                    .filterCategoryById(UUID.fromString(product.getCategoryId()));
+        if (product.getCategory().getId() != null) {
+            Optional<Category> getCategory = this.categoryService.filterCategoryById(product.getCategory().getId());
 
             if (!getCategory.isPresent()) {
                 throw new NotFoundException("New category not found.");
@@ -163,10 +149,6 @@ public class ProductService {
         }
 
         Product editProduct = this.repository.save(getProductBefore.get());
-
-        editProduct.setCategoryId(editProduct.getCategory().getId().toString());
-
-        editProduct.setCategoryName(editProduct.getCategory().getName());
 
         return editProduct;
     }

@@ -17,7 +17,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "product_skus")
@@ -57,9 +56,6 @@ public class ProductSku {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Transient
-    private Product productRelationed;
 
     public ProductSku() {}
 
@@ -169,11 +165,4 @@ public class ProductSku {
         this.gender = gender;
     }
 
-    public Product getProductRelationed() {
-        return productRelationed;
-    }
-
-    public void setProductRelationed(Product productRelationed) {
-        this.productRelationed = productRelationed;
-    }
 }

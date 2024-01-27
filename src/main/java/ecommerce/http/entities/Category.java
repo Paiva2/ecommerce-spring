@@ -8,9 +8,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.UUID;
 import java.time.Instant;
 import java.util.Set;
+
 
 @Entity
 @Table(name = "categories")
@@ -30,6 +32,7 @@ public class Category {
     @Column(nullable = true, name = "updated_at")
     private Instant updatedAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "category")
     private Set<Product> products;
 

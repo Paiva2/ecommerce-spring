@@ -37,8 +37,7 @@ public class ProductController {
     public ResponseEntity<Map<String, String>> insertNewProduct(
             @RequestBody @Valid InsertNewProductDto insertNewProductDto) {
 
-        this.productService.insertProduct(insertNewProductDto.toProduct(),
-                insertNewProductDto.toProductSku());
+        this.productService.insertProduct(insertNewProductDto.toProduct());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap("message", "Product inserted successfully."));
