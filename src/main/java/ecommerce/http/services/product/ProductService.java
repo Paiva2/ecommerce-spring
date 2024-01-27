@@ -6,27 +6,27 @@ import org.springframework.lang.NonNull;
 import org.springframework.beans.BeanWrapperImpl;
 import java.beans.PropertyDescriptor;
 import org.springframework.beans.BeanWrapper;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import ecommerce.http.entities.Category;
 import ecommerce.http.entities.Product;
 import ecommerce.http.entities.ProductSku;
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.ProductRepository;
+import ecommerce.http.repositories.ProductRepositoryCustom;
 import ecommerce.http.repositories.ProductSkuRepository;
-import ecommerce.http.services.ProductSku.ProductSkuService;
 import ecommerce.http.services.category.CategoryService;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-
 @Service
 public class ProductService {
+
+    @Autowired
+    private final ProductRepositoryCustom productRepositoryCustom;
+
     @Autowired
     private final ProductRepository repository;
 
@@ -37,10 +37,12 @@ public class ProductService {
     private final ProductSkuRepository productSkuRepository;
 
     public ProductService(ProductRepository productRepository, CategoryService categoryService,
-            ProductSkuRepository productSkuRepository, ProductSkuService productSkuService) {
+            ProductSkuRepository productSkuRepository,
+            ProductRepositoryCustom productRepositoryCustom) {
         this.repository = productRepository;
         this.categoryService = categoryService;
         this.productSkuRepository = productSkuRepository;
+        this.productRepositoryCustom = productRepositoryCustom;
     }
 
     public Product insertProduct(Product newProduct, @NonNull ProductSku firstSku) {
@@ -96,8 +98,9 @@ public class ProductService {
         return findProduct;
     }
 
+
     public Page<Product> listAllProducts(Integer pageNumber, Integer perPage, Boolean active,
-            String color, String name) {
+            String name, String categoryName, String color, String size) {
         if (pageNumber == null || pageNumber < 0) {
             pageNumber = 1;
         }
@@ -106,11 +109,8 @@ public class ProductService {
             perPage = 5;
         }
 
-        Pageable pageable = PageRequest.of((pageNumber - 1), perPage);
-
-        Product queryProduct = new Product(name, active);
-
-        Page<Product> productList = this.repository.findAll(Example.of(queryProduct), pageable);
+        Page<Product> productList = this.productRepositoryCustom.dynamicQuery(name, color, size,
+                categoryName, active, pageNumber, perPage);
 
         productList.forEach(product -> {
             if (product.getCategory() != null) {
