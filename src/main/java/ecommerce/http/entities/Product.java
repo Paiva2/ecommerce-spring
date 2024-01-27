@@ -2,6 +2,8 @@ package ecommerce.http.entities;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
@@ -44,8 +46,8 @@ public class Product {
     @Transient
     private String categoryName;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "product")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<ProductSku> skus;
 
     @CreationTimestamp
@@ -65,31 +67,20 @@ public class Product {
         this.categoryId = categoryId;
     }
 
-    /*
-     * // Repository public Product(UUID id, String name, Double price, Double priceOnSale, String
-     * description, String colors, String sizes, Boolean isOnSale, Boolean active) { this.id = id;
-     * this.name = name; this.price = price; this.priceOnSale = priceOnSale; this.description =
-     * description; this.colors = colors; this.sizes = sizes; this.isOnSale = isOnSale; this.active
-     * = active; }
-     * 
-     * // Creation default public Product(String name, Double price, Double priceOnSale, String
-     * description, String colors, String sizes, Boolean isOnSale, Category category) { this.name =
-     * name; this.price = price; this.priceOnSale = priceOnSale; this.description = description;
-     * this.colors = colors; this.sizes = sizes; this.isOnSale = isOnSale; this.category = category;
-     * }
-     * 
-     * // Creation DTO public Product(String name, Double price, Double priceOnSale, String
-     * description, String colors, String sizes, Boolean isOnSale, String categoryId) { this.name =
-     * name; this.price = price; this.priceOnSale = priceOnSale; this.description = description;
-     * this.colors = colors; this.sizes = sizes; this.isOnSale = isOnSale; this.categoryId =
-     * categoryId; }
-     * 
-     * // Update DTO public Product(UUID id, String name, Double price, Double priceOnSale, String
-     * description, String colors, String sizes, Boolean isOnSale, String categoryId, Boolean
-     * active) { this.id = id; this.name = name; this.price = price; this.priceOnSale = priceOnSale;
-     * this.description = description; this.colors = colors; this.sizes = sizes; this.isOnSale =
-     * isOnSale; this.categoryId = categoryId; this.active = active; }
-     */
+    // Update DTO
+    public Product(UUID id, String name, String description, String categoryId, Boolean active) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.active = active;
+    }
+
+    // Example QueryDTO
+    public Product(String name, Boolean active) {
+        this.name = name;
+        this.active = active;
+    }
 
     public UUID getId() {
         return id;

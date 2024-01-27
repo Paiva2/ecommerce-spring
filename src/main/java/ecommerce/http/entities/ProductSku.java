@@ -5,13 +5,20 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import ecommerce.http.enums.Gender;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "product_skus")
@@ -36,7 +43,11 @@ public class ProductSku {
 
     private Integer quantity;
 
-    @ManyToOne(targetEntity = Product.class)
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @JsonIgnore
+    @ManyToOne(targetEntity = Product.class, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -48,14 +59,19 @@ public class ProductSku {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Transient
+    private Product productRelationed;
+
     public ProductSku() {}
 
     // Creation DTO
-    public ProductSku(String color, String size, BigDecimal price, Integer quantity) {
+    public ProductSku(String color, String size, BigDecimal price, Integer quantity,
+            Gender gender) {
         this.color = color;
         this.size = size;
         this.price = price;
         this.quantity = quantity;
+        this.gender = gender;
     }
 
     public UUID getId() {
@@ -144,5 +160,21 @@ public class ProductSku {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public Product getProductRelationed() {
+        return productRelationed;
+    }
+
+    public void setProductRelationed(Product productRelationed) {
+        this.productRelationed = productRelationed;
     }
 }

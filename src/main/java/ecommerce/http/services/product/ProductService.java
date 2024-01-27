@@ -2,18 +2,14 @@ package ecommerce.http.services.product;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 import org.springframework.beans.BeanWrapperImpl;
 import java.beans.PropertyDescriptor;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.NonNull;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import ecommerce.http.entities.Category;
 import ecommerce.http.entities.Product;
 import ecommerce.http.entities.ProductSku;
@@ -21,7 +17,13 @@ import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.ProductRepository;
 import ecommerce.http.repositories.ProductSkuRepository;
+import ecommerce.http.services.ProductSku.ProductSkuService;
 import ecommerce.http.services.category.CategoryService;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
 
 @Service
 public class ProductService {
@@ -35,7 +37,7 @@ public class ProductService {
     private final ProductSkuRepository productSkuRepository;
 
     public ProductService(ProductRepository productRepository, CategoryService categoryService,
-            ProductSkuRepository productSkuRepository) {
+            ProductSkuRepository productSkuRepository, ProductSkuService productSkuService) {
         this.repository = productRepository;
         this.categoryService = categoryService;
         this.productSkuRepository = productSkuRepository;
@@ -94,8 +96,8 @@ public class ProductService {
         return findProduct;
     }
 
-    public Page<Product> listAllProducts(Boolean active, Integer pageNumber, Integer perPage,
-            String colors, String categoryName) {
+    public Page<Product> listAllProducts(Integer pageNumber, Integer perPage, Boolean active,
+            String color, String name) {
         if (pageNumber == null || pageNumber < 0) {
             pageNumber = 1;
         }
@@ -106,15 +108,9 @@ public class ProductService {
 
         Pageable pageable = PageRequest.of((pageNumber - 1), perPage);
 
-        Page<Product> productList = this.repository.findAll(pageable);
+        Product queryProduct = new Product(name, active);
 
-        /*
-         * if (active != null) { productList = this.repository.findAllByStatus(active, pageable); }
-         * else if (colors != null) { productList = this.repository.findAllByColor(colors,
-         * pageable); } else if (categoryName != null) { productList =
-         * this.repository.findByCategory(categoryName, pageable); } else { productList =
-         * this.repository.findAll(pageable); }
-         */
+        Page<Product> productList = this.repository.findAll(Example.of(queryProduct), pageable);
 
         productList.forEach(product -> {
             if (product.getCategory() != null) {
@@ -156,7 +152,7 @@ public class ProductService {
 
         for (PropertyDescriptor field : propertiesToUpdate) {
             String fieldName = field.getName();
-            Object fieldValue = refUpdate.getPropertyValue(field.getName());
+            Object fieldValue = refUpdate.getPropertyValue(fieldName);
 
             Boolean updatableField = fieldName.hashCode() != "class".hashCode()
                     && fieldName.hashCode() != "id".hashCode();

@@ -3,6 +3,7 @@ package ecommerce.http.dtos.product;
 import java.math.BigDecimal;
 import ecommerce.http.entities.Product;
 import ecommerce.http.entities.ProductSku;
+import ecommerce.http.enums.Gender;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -40,12 +41,15 @@ public class InsertNewProductDto {
     @Min(value = 1)
     private Integer quantity;
 
+    @NotNull(message = "gender can't be null.")
+    private Gender gender;
+
     public Product toProduct() {
         return new Product(this.name, this.description, this.categoryId);
     }
 
     public ProductSku toProductSku() {
-        return new ProductSku(this.color, this.size, this.price, this.quantity);
+        return new ProductSku(this.color, this.size, this.price, this.quantity, this.gender);
     }
 
     public String getName() {
@@ -102,5 +106,13 @@ public class InsertNewProductDto {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 }

@@ -10,7 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.util.UUID;
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "categories")
@@ -31,7 +31,7 @@ public class Category {
     private Instant updatedAt;
 
     @OneToMany(mappedBy = "category")
-    private List<Product> products;
+    private Set<Product> products;
 
     public Category() {}
 
@@ -76,14 +76,11 @@ public class Category {
         this.updatedAt = updatedAt;
     }
 
-    public List<Product> getProducts() {
+    public Set<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(Set<Product> products) {
         this.products = products;
     }
-
-
-
 }

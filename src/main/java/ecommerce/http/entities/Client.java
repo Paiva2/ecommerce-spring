@@ -38,8 +38,7 @@ public class Client implements UserDetails {
     @Column(nullable = false, updatable = true)
     private UserRole role = UserRole.USER;
 
-    public Client() {
-    }
+    public Client() {}
 
     public Client(String name, String email, String password, String privateQuestion,
             String privateAnswer) {

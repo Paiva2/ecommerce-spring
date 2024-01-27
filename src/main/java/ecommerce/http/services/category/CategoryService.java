@@ -1,6 +1,7 @@
 package ecommerce.http.services.category;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import ecommerce.http.entities.Category;
 import ecommerce.http.exceptions.BadRequestException;
@@ -57,7 +58,7 @@ public class CategoryService {
         return formatCategories;
     }
 
-    public Optional<Category> filterCategoryById(UUID categoryId) {
+    public Optional<Category> filterCategoryById(@NonNull UUID categoryId) {
         return this.repository.findById(categoryId);
     }
 }
