@@ -36,7 +36,8 @@ public class ProductService {
     @Autowired
     private final ProductSkuService productSkuService;
 
-    public ProductService(ProductRepository productRepository, CategoryService categoryService, ProductSkuService productSkuService, ProductRepositoryCustom productRepositoryCustom) {
+    public ProductService(ProductRepository productRepository, CategoryService categoryService,
+            ProductSkuService productSkuService, ProductRepositoryCustom productRepositoryCustom) {
         this.repository = productRepository;
         this.categoryService = categoryService;
         this.productSkuService = productSkuService;
@@ -48,7 +49,8 @@ public class ProductService {
             throw new BadRequestException("Invalid new product schema.");
         }
 
-        Optional<Category> doesCategoryExists = this.categoryService.filterCategoryById(newProduct.getCategory().getId());
+        Optional<Category> doesCategoryExists =
+                this.categoryService.filterCategoryById(newProduct.getCategory().getId());
 
         if (doesCategoryExists.isEmpty()) {
             throw new NotFoundException("Product category doesn't exists.");
@@ -61,7 +63,8 @@ public class ProductService {
         ProductSku productSku = newProduct.getSkus().stream().toList().get(0);
 
         if (productSku == null) {
-            throw new BadRequestException("You need to insert at least one sku while creating a new product.");
+            throw new BadRequestException(
+                    "You need to insert at least one sku while creating a new product.");
         }
 
         productSku.setProduct(productCreated);
@@ -89,7 +92,8 @@ public class ProductService {
         return findProduct;
     }
 
-    public Page<Product> listAllProducts(Integer pageNumber, Integer perPage, Boolean active, String name, String categoryName, String color, String size) {
+    public Page<Product> listAllProducts(Integer pageNumber, Integer perPage, Boolean active,
+            String name, String categoryName, String color, String size) {
         if (pageNumber == null || pageNumber < 0) {
             pageNumber = 1;
         }
@@ -98,7 +102,8 @@ public class ProductService {
             perPage = 5;
         }
 
-        Page<Product> productList = this.productRepositoryCustom.dynamicQuery(name, color, size, categoryName, active, pageNumber, perPage);
+        Page<Product> productList = this.productRepositoryCustom.dynamicQuery(name, color, size,
+                categoryName, active, pageNumber, perPage);
 
         return productList;
     }
@@ -108,8 +113,9 @@ public class ProductService {
             throw new BadRequestException("Product can't be null.");
         }
 
-        if (product.getCategory().getId() != null) {
-            Optional<Category> getCategory = this.categoryService.filterCategoryById(product.getCategory().getId());
+        if (product.getCategory() != null) {
+            Optional<Category> getCategory =
+                    this.categoryService.filterCategoryById(product.getCategory().getId());
 
             if (getCategory.isEmpty()) {
                 throw new NotFoundException("New category not found.");
@@ -134,7 +140,8 @@ public class ProductService {
             String fieldName = field.getName();
             Object fieldValue = refUpdate.getPropertyValue(fieldName);
 
-            Boolean updatableField = fieldName.hashCode() != "class".hashCode() && fieldName.hashCode() != "id".hashCode() && fieldValue != null;
+            Boolean updatableField = fieldName.hashCode() != "class".hashCode()
+                    && fieldName.hashCode() != "id".hashCode() && fieldValue != null;
 
             if (updatableField) {
                 refSource.setPropertyValue(fieldName, fieldValue);

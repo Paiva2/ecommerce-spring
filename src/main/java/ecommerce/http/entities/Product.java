@@ -4,7 +4,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.lang.NonNull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -59,7 +58,7 @@ public class Product {
     }
 
     // Update DTO
-    public Product(UUID id, String name, String description, String categoryId, Boolean active) {
+    public Product(UUID id, String name, String description, Boolean active) {
         this.id = id;
         this.name = name;
         this.description = description;

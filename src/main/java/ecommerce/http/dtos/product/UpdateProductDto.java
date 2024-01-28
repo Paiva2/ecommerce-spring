@@ -1,6 +1,7 @@
 package ecommerce.http.dtos.product;
 
 import java.util.UUID;
+import ecommerce.http.entities.Category;
 import ecommerce.http.entities.Product;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
@@ -21,7 +22,20 @@ public class UpdateProductDto {
     private String categoryId;
 
     public Product toProduct(UUID productId) {
-        return new Product(productId, this.name, this.description, this.categoryId, this.active);
+        Product product = new Product(productId, this.name, this.description, this.active);
+
+        if (categoryId != null) {
+            product.setCategory(categoryBuilder());
+        }
+
+        return product;
+    }
+
+    public Category categoryBuilder() {
+        Category category = new Category();
+        category.setId(UUID.fromString(categoryId));
+
+        return category;
     }
 
     public UUID getId() {
@@ -48,19 +62,19 @@ public class UpdateProductDto {
         this.description = description;
     }
 
-    public String getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
-
     public Boolean getActive() {
         return active;
     }
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 }

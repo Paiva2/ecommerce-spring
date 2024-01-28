@@ -18,6 +18,14 @@ public class SecurityConfig {
 
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                String[] forbiddenPosts = {"/api/v1/category/*", "/api/v1/sku/*", "/api/v1/sku/**",
+                                "/api/v1/product/*"};
+
+                String[] forbiddenPatchs =
+                                {"/api/v1/product/*", "/api/v1/sku/**", "/api/v1/product/*"};
+
+                String[] forbiddenDeletes = {"/api/v1/sku/**", "api/v1/product/**"};
+
                 return http.csrf(csrf -> csrf.disable())
                                 .sessionManagement(session -> session.sessionCreationPolicy(
                                                 SessionCreationPolicy.STATELESS))
@@ -25,17 +33,12 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/api/v1/clients/profile")
                                                 .authenticated()
-                                                .requestMatchers(HttpMethod.GET,
-                                                                "/api/v1/category/list")
-                                                .permitAll()
-                                                .requestMatchers(HttpMethod.GET,
-                                                                "/api/v1/product/{productId}")
-                                                .permitAll()
-                                                .requestMatchers(HttpMethod.PATCH,
-                                                                "/api/v1/product/*")
+                                                .requestMatchers(HttpMethod.PATCH, forbiddenPatchs)
                                                 .hasRole("ADMIN")
-                                                .requestMatchers(HttpMethod.POST,
-                                                                "/api/v1/category/*")
+                                                .requestMatchers(HttpMethod.DELETE,
+                                                                forbiddenDeletes)
+                                                .hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.POST, forbiddenPosts)
                                                 .hasRole("ADMIN").anyRequest().permitAll())
                                 .addFilterBefore(securityFilter,
                                                 UsernamePasswordAuthenticationFilter.class)

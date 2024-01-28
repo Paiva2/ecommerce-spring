@@ -2,12 +2,15 @@ package ecommerce.http.services.productSku;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 import java.beans.PropertyDescriptor;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 import ecommerce.http.entities.Product;
 import ecommerce.http.entities.ProductSku;
@@ -102,5 +105,40 @@ public class ProductSkuService {
         if (productSkuRemoval < 1) {
             throw new NotFoundException("Sku not found.");
         }
+    }
+
+    public ProductSku getSkuById(UUID skuId) {
+        if (skuId == null) {
+            throw new BadRequestException("Invalid sku id.");
+        }
+
+        Optional<ProductSku> getSku = this.productSkuRepository.findById(skuId);
+
+        if (getSku.isEmpty()) {
+            throw new NotFoundException("Sku not found.");
+        }
+
+        return getSku.get();
+    }
+
+    public Page<ProductSku> getAllSkus(Integer page, Integer perPage, String active) {
+        if (page < 1) {
+            page = 1;
+        }
+
+        if (perPage < 5) {
+            perPage = 5;
+        }
+
+        Page<ProductSku> getSkus = null;
+        PageRequest pageable = PageRequest.of(page - 1, perPage);
+
+        if (active == null) {
+            getSkus = this.productSkuRepository.findAll(pageable);
+        } else {
+            getSkus = this.productSkuRepository.findAllByStatus(Boolean.valueOf(active), pageable);
+        }
+
+        return getSkus;
     }
 }
