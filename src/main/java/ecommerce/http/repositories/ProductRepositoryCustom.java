@@ -23,8 +23,7 @@ public class ProductRepositoryCustom {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ProductRepositoryCustom() {
-    }
+    public ProductRepositoryCustom() {}
 
     public Page<Product> dynamicQuery(String productName, String color, String size,
             String categoryName, Boolean active, Integer page, Integer perPage) {
@@ -33,13 +32,24 @@ public class ProductRepositoryCustom {
         CriteriaQuery<Product> criteriaQuery = criteriaBuilder.createQuery(Product.class);
         Root<Product> root = criteriaQuery.from(Product.class);
 
-        Join<Product, ProductSku> joinSkus = root.join("skus");
-        Join<Product, Category> joinCategories = root.join("category");
+        Join<Product, ProductSku> joinSkus = null;
+        Join<Product, Category> joinCategories = null;
+
+        if (productName != null || categoryName != null || color != null || size != null) {
+            joinSkus = root.join("skus");
+            joinCategories = root.join("category");
+        }
 
         List<Predicate> predicates = new ArrayList<>();
 
         if (productName != null) {
-            predicates.add(criteriaBuilder.equal(root.get("name"), productName));
+            String[] nameToFind = productName.split(" ");
+
+            if (nameToFind.length - 1 > 0) {
+                predicates.add(criteriaBuilder.equal(root.get("name"), productName));
+            } else {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + nameToFind[0] + "%"));
+            }
         }
 
         if (categoryName != null) {
@@ -48,6 +58,10 @@ public class ProductRepositoryCustom {
 
         if (color != null) {
             predicates.add(criteriaBuilder.equal(joinSkus.get("color"), color));
+        }
+
+        if (size != null) {
+            predicates.add(criteriaBuilder.equal(joinSkus.get("size"), size));
         }
 
         if (active != null) {

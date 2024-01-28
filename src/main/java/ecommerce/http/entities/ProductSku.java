@@ -3,6 +3,7 @@ package ecommerce.http.entities;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -57,16 +58,30 @@ public class ProductSku {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public ProductSku() {}
+    public ProductSku() {
+    }
 
     // Creation DTO
     public ProductSku(String color, String size, BigDecimal price, Integer quantity,
-            Gender gender) {
+                      Gender gender) {
         this.color = color;
         this.size = size;
         this.price = price;
         this.quantity = quantity;
         this.gender = gender;
+    }
+
+    // Update DTO
+    public ProductSku(Boolean active, Boolean isOnSale, BigDecimal price, Integer quantity,
+                      String color, Gender gender, String size, BigDecimal priceOnsale) {
+        this.active = active;
+        this.isOnSale = isOnSale;
+        this.price = price;
+        this.quantity = quantity;
+        this.color = color;
+        this.gender = gender;
+        this.size = size;
+        this.priceOnSale = priceOnsale;
     }
 
     public UUID getId() {
@@ -164,5 +179,4 @@ public class ProductSku {
     public void setGender(Gender gender) {
         this.gender = gender;
     }
-
 }
