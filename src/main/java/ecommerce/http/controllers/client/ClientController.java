@@ -2,10 +2,12 @@ package ecommerce.http.controllers.client;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 import ecommerce.http.dtos.client.AuthClientDto;
 import ecommerce.http.dtos.client.ForgotPasswordClientDto;
 import ecommerce.http.dtos.client.RegisterClientDto;
+import ecommerce.http.dtos.client.UpdateProfileDto;
 import ecommerce.http.entities.Client;
 import ecommerce.http.services.client.ClientService;
 import ecommerce.http.services.jwt.JwtService;
@@ -79,6 +81,19 @@ public class ClientController {
         Map<String, String> getClientProfile = this.clientService.getProfile(parseToken);
 
         return ResponseEntity.ok().body(Collections.singletonMap("profile", getClientProfile));
+    }
+
+    @PatchMapping("/profile")
+    public ResponseEntity<Map<String, Client>> updateProfile(@RequestBody @Valid UpdateProfileDto updateprofileDto,
+            @RequestHeader("Authorization") String headers)
+            throws Exception {
+        String headerToken = headers.replaceAll("Bearer", "");
+
+        String parseToken = jwtService.validateToken(headerToken);
+
+        Client update = this.clientService.editProfile(updateprofileDto.toClient(), UUID.fromString(parseToken));
+
+        return ResponseEntity.ok().body(Collections.singletonMap("message", update));
     }
 
 }

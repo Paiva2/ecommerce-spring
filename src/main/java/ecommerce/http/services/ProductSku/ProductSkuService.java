@@ -10,7 +10,6 @@ import org.springframework.beans.BeanWrapperImpl;
 import java.beans.PropertyDescriptor;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.List;
 
 import ecommerce.http.entities.Product;
 import ecommerce.http.entities.ProductSku;
@@ -71,8 +70,6 @@ public class ProductSkuService {
         for (PropertyDescriptor field : fieldsToUpdate) {
             String fieldName = field.getName();
             Object fieldValue = skuTarget.getPropertyValue(fieldName);
-
-            System.out.println(skuUpdated.getPriceOnSale());
 
             Boolean doesFieldCanUpdate = fieldName.hashCode() != "id".hashCode()
                     && fieldName.hashCode() != "class".hashCode();
