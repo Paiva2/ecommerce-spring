@@ -27,10 +27,12 @@ public class CategoryController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<Map<String, String>> newCategory(@RequestBody @Valid NewCategoryDto categoryDto) {
+    public ResponseEntity<Map<String, String>> newCategory(
+            @RequestBody @Valid NewCategoryDto categoryDto) {
         this.categoryService.createCategory(categoryDto.toCategory());
 
-        return ResponseEntity.status(201).body(Collections.singletonMap("message", "Category successfully created!"));
+        return ResponseEntity.status(201)
+                .body(Collections.singletonMap("message", "Category successfully created!"));
     }
 
     @GetMapping("/list")
@@ -39,4 +41,6 @@ public class CategoryController {
 
         return ResponseEntity.ok().body(categories);
     }
+
+    // TODO: FINISH ALL CRUD OPERATIONS
 }
