@@ -1,19 +1,21 @@
 package ecommerce.http.services.client;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import ecommerce.http.repositories.ClientRepository;
+import ecommerce.http.services.wallet.WalletService;
 import ecommerce.http.entities.Client;
+
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.ConflictException;
 import ecommerce.http.exceptions.ForbiddenException;
 import ecommerce.http.exceptions.NotAllowedException;
 import ecommerce.http.exceptions.NotFoundException;
-import ecommerce.http.repositories.ClientRepository;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -27,10 +29,14 @@ public class ClientService {
     @Autowired
     private final ClientRepository repository;
 
+    @Autowired
+    private final WalletService walletService;
+
     private final BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder(6);
 
-    public ClientService(ClientRepository repository) {
+    public ClientService(ClientRepository repository, WalletService walletService) {
         this.repository = repository;
+        this.walletService = walletService;
     }
 
     public Client auth(Client client) {
@@ -68,6 +74,7 @@ public class ClientService {
         String hashedPassword = bcrypt.encode(client.getPassword());
 
         client.setPassword(hashedPassword);
+        client.setWallet(this.walletService.generateWallet());
 
         Client createdClient = this.repository.save(client);
 
@@ -107,7 +114,7 @@ public class ClientService {
         }
     }
 
-    public Map<String, String> getProfile(String clientId) {
+    public Map<String, Object> getProfile(String clientId) {
         if (clientId == null) {
             throw new BadRequestException("Client id can't be empty.");
         }
@@ -122,12 +129,13 @@ public class ClientService {
 
         Client retrieveClient = getClient.get();
 
-        Map<String, String> clientMap = new HashMap<>();
+        Map<String, Object> clientMap = new LinkedHashMap<>();
 
         clientMap.put("id", retrieveClient.getId().toString());
         clientMap.put("name", retrieveClient.getName());
         clientMap.put("email", retrieveClient.getEmail());
         clientMap.put("role", retrieveClient.getRole().toString());
+        clientMap.put("wallet", retrieveClient.getWallet());
 
         return clientMap;
     }

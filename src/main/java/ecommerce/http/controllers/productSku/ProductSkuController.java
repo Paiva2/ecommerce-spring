@@ -1,7 +1,6 @@
 package ecommerce.http.controllers.productSku;
 
 import java.util.UUID;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import ecommerce.http.dtos.productSku.InsertNewSkuDto;

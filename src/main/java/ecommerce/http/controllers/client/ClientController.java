@@ -72,26 +72,27 @@ public class ClientController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<Map<String, Map<String, String>>> profile(
+    public ResponseEntity<Map<String, Map<String, Object>>> profile(
             @RequestHeader("Authorization") String headers) {
         String headerToken = headers.replaceAll("Bearer", "");
 
         String parseToken = jwtService.validateToken(headerToken);
 
-        Map<String, String> getClientProfile = this.clientService.getProfile(parseToken);
+        Map<String, Object> getClientProfile = this.clientService.getProfile(parseToken);
 
         return ResponseEntity.ok().body(Collections.singletonMap("profile", getClientProfile));
     }
 
     @PatchMapping("/profile")
-    public ResponseEntity<Map<String, Client>> updateProfile(@RequestBody @Valid UpdateProfileDto updateprofileDto,
-            @RequestHeader("Authorization") String headers)
-            throws Exception {
+    public ResponseEntity<Map<String, Client>> updateProfile(
+            @RequestBody @Valid UpdateProfileDto updateprofileDto,
+            @RequestHeader("Authorization") String headers) throws Exception {
         String headerToken = headers.replaceAll("Bearer", "");
 
         String parseToken = jwtService.validateToken(headerToken);
 
-        Client update = this.clientService.editProfile(updateprofileDto.toClient(), UUID.fromString(parseToken));
+        Client update = this.clientService.editProfile(updateprofileDto.toClient(),
+                UUID.fromString(parseToken));
 
         return ResponseEntity.ok().body(Collections.singletonMap("message", update));
     }

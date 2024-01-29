@@ -2,12 +2,15 @@ package ecommerce.http.repositories;
 
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Component;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
 import ecommerce.http.entities.Category;
 import ecommerce.http.entities.Product;
 import ecommerce.http.entities.ProductSku;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -15,6 +18,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.domain.PageImpl;
+
 import java.util.List;
 import java.util.ArrayList;
 

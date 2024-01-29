@@ -3,6 +3,9 @@ package ecommerce.http.entities;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,10 +13,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ecommerce.http.enums.UserRole;
+import jakarta.persistence.CascadeType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -41,6 +48,11 @@ public class Client implements UserDetails {
 
     @Column(nullable = false, updatable = true)
     private UserRole role = UserRole.USER;
+
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "wallet_id", referencedColumnName = "id")
+    private ClientWallet wallet;
 
     @Transient
     private String newPassword;
@@ -222,5 +234,13 @@ public class Client implements UserDetails {
 
     public void setNewPrivateAnswer(String newPrivateAnswer) {
         this.newPrivateAnswer = newPrivateAnswer;
+    }
+
+    public ClientWallet getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(ClientWallet wallet) {
+        this.wallet = wallet;
     }
 }
