@@ -17,8 +17,12 @@ public class ForgotPasswordClientDto {
     @Size(min = 6, max = 9999, message = "newPassword must have at least 6 characters")
     private String newPassword;
 
+    @NotBlank(message = "privateAnswer can't be empty")
+    @NotNull(message = "privateAnswer can't be null")
+    private String privateAnswer;
+
     public Client toClient() {
-        return new Client(email, newPassword);
+        return new Client(email, newPassword, privateAnswer);
     }
 
     public String getEmail() {
@@ -37,4 +41,11 @@ public class ForgotPasswordClientDto {
         this.newPassword = newPassword;
     }
 
+    public String getPrivateAnswer() {
+        return privateAnswer;
+    }
+
+    public void setPrivateAnswer(String privateAnswer) {
+        this.privateAnswer = privateAnswer;
+    }
 }

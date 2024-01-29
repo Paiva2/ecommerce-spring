@@ -8,6 +8,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import ecommerce.http.entities.Client;
+import ecommerce.http.exceptions.BadRequestException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ public class JwtService {
 
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
+
+            System.out.println(generateExpirationTime());
 
             String token = JWT.create().withIssuer("ecommerce-api").withSubject(subjectId)
                     .withExpiresAt(generateExpirationTime()).sign(algorithm);
@@ -40,13 +44,13 @@ public class JwtService {
 
             return verifier.verify(token.trim()).getSubject().toString();
         } catch (JWTVerificationException exception) {
-            throw new RuntimeException("Invalid token...", exception);
+            throw new BadRequestException(exception.toString());
         }
     }
 
     private Instant generateExpirationTime() {
-        ZoneOffset OFFSET = ZoneOffset.of("-3");
+        ZoneOffset OFFSET = ZoneOffset.of("+0"); // GMT
 
-        return LocalDateTime.now().plusHours(3).toInstant(OFFSET);
+        return LocalDateTime.now().plusHours(10).toInstant(OFFSET);
     }
 }

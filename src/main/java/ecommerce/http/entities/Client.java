@@ -51,13 +51,11 @@ public class Client implements UserDetails {
     @Transient
     private String newPrivateAnswer;
 
-    public Client() {
-    }
+    public Client() {}
 
     // Register DTO
     public Client(String name, String email, String password, String privateQuestion,
-            String privateAnswer, String newPassword,
-            String newPrivateQuestion,
+            String privateAnswer, String newPassword, String newPrivateQuestion,
             String newPrivateAnswer) {
         this.email = email;
         this.name = name;
@@ -79,6 +77,14 @@ public class Client implements UserDetails {
         this.privateAnswer = privateAnswer;
     }
 
+    // Forgot password DTO
+    public Client(String email, String password, String privateAnswer) {
+        this.email = email;
+        this.password = password;
+        this.privateAnswer = privateAnswer;
+    }
+
+    // Auth Client DTO
     public Client(String email, String password) {
         this.email = email;
         this.password = password;
@@ -111,7 +117,7 @@ public class Client implements UserDetails {
         this.password = password;
     }
 
-    /* @JsonIgnore */
+    @JsonIgnore
     public String getPassword() {
         return this.password;
     }
@@ -182,7 +188,7 @@ public class Client implements UserDetails {
         this.newPassword = newPassword;
     }
 
-    /* @JsonIgnore */
+    @JsonIgnore
     public String getPrivateQuestion() {
         return privateQuestion;
     }

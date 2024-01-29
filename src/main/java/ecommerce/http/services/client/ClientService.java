@@ -14,6 +14,7 @@ import ecommerce.http.exceptions.ForbiddenException;
 import ecommerce.http.exceptions.NotAllowedException;
 import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.ClientRepository;
+
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import java.beans.PropertyDescriptor;
@@ -43,7 +44,8 @@ public class ClientService {
             throw new ConflictException("User not found.");
         }
 
-        boolean doesPasswordsMatches = this.bcrypt.matches(client.getPassword(), getClient.get().getPassword());
+        boolean doesPasswordsMatches =
+                this.bcrypt.matches(client.getPassword(), getClient.get().getPassword());
 
         if (!doesPasswordsMatches) {
             throw new NotAllowedException("Invalid credentials.");
@@ -72,10 +74,26 @@ public class ClientService {
         return createdClient;
     }
 
-    // TODO: ADD SECRET QUESTION AND ANSWER VALIDATION B4
     public void forgotPassword(Client client) {
         if (client == null) {
             throw new BadRequestException("Invalid client informations.");
+        }
+
+        if (client.getPrivateAnswer() == null) {
+            throw new BadRequestException("Invalid private answer");
+        }
+
+        Optional<Client> doesClientExists = this.repository.findByEmail(client.getEmail());
+
+        if (doesClientExists.isEmpty()) {
+            throw new NotFoundException("User not found.");
+        }
+
+        Boolean doesPrivateAnswerMatches =
+                doesClientExists.get().getPrivateAnswer().equals(client.getPrivateAnswer());
+
+        if (!doesPrivateAnswerMatches) {
+            throw new ForbiddenException("Invalid private answer");
         }
 
         String hashNewPassword = bcrypt.encode(client.getPassword());
@@ -154,7 +172,8 @@ public class ClientService {
         }
 
         if (clientOldPrivateQuestion != null || clientNewPrivateQuestion != null) {
-            if (this.checkOldAndNew(clientOldPrivateQuestion, clientNewPrivateQuestion, "private question")) {
+            if (this.checkOldAndNew(clientOldPrivateQuestion, clientNewPrivateQuestion,
+                    "private question")) {
                 Boolean doesOldPrivateQuestionMatch = getCurrentProfile.get().getPrivateQuestion()
                         .equals(clientOldPrivateQuestion);
 
@@ -167,9 +186,10 @@ public class ClientService {
         }
 
         if (clientOldPrivateAnswer != null || clientNewPrivateAnswer != null) {
-            if (this.checkOldAndNew(clientOldPrivateAnswer, clientNewPrivateAnswer, "private answer")) {
-                Boolean doesOldPrivateAnswerMatch = getCurrentProfile.get().getPrivateAnswer()
-                        .equals(clientOldPrivateAnswer);
+            if (this.checkOldAndNew(clientOldPrivateAnswer, clientNewPrivateAnswer,
+                    "private answer")) {
+                Boolean doesOldPrivateAnswerMatch =
+                        getCurrentProfile.get().getPrivateAnswer().equals(clientOldPrivateAnswer);
 
                 if (!doesOldPrivateAnswerMatch) {
                     throw new ForbiddenException("Old private answer doesn't match.");
@@ -180,9 +200,11 @@ public class ClientService {
         }
 
         if (clientProfileUpdate.getEmail() != null) {
-            Optional<Client> doesEmailAlreadyExists = this.repository.findByEmail(clientProfileUpdate.getEmail());
+            Optional<Client> doesEmailAlreadyExists =
+                    this.repository.findByEmail(clientProfileUpdate.getEmail());
 
-            if (doesEmailAlreadyExists.isPresent() && doesEmailAlreadyExists.get().getId() != clientId) {
+            if (doesEmailAlreadyExists.isPresent()
+                    && doesEmailAlreadyExists.get().getId() != clientId) {
                 throw new ConflictException("E-mail already exists.");
             }
         }
@@ -192,11 +214,8 @@ public class ClientService {
 
         PropertyDescriptor[] fieldsToUpdate = updatedProfile.getPropertyDescriptors();
 
-        List<String> updatableFields = List.of("email",
-                "name",
-                "password",
-                "privateQuestion",
-                "privateAnswer");
+        List<String> updatableFields =
+                List.of("email", "name", "password", "privateQuestion", "privateAnswer");
 
         for (PropertyDescriptor field : fieldsToUpdate) {
             String fieldName = field.getName();
