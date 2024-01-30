@@ -21,10 +21,11 @@ public class SecurityConfig {
                 String[] forbiddenPosts = {"/api/v1/category/*", "/api/v1/sku/*", "/api/v1/sku/**",
                                 "/api/v1/product/*"};
 
-                String[] forbiddenPatchs =
-                                {"/api/v1/product/*", "/api/v1/sku/**", "/api/v1/product/*"};
+                String[] forbiddenPatchs = {"/api/v1/product/*", "/api/v1/sku/**",
+                                "/api/v1/product/*", "/api/v1/category/**"};
 
-                String[] forbiddenDeletes = {"/api/v1/sku/**", "api/v1/product/**"};
+                String[] forbiddenDeletes =
+                                {"/api/v1/sku/**", "api/v1/product/**", "/api/v1/category/**"};
 
                 return http.csrf(csrf -> csrf.disable())
                                 .sessionManagement(session -> session.sessionCreationPolicy(

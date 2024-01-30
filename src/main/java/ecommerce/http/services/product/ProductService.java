@@ -49,14 +49,14 @@ public class ProductService {
             throw new BadRequestException("Invalid new product schema.");
         }
 
-        Optional<Category> doesCategoryExists =
+        Category doesCategoryExists =
                 this.categoryService.filterCategoryById(newProduct.getCategory().getId());
 
-        if (doesCategoryExists.isEmpty()) {
+        if (doesCategoryExists == null) {
             throw new NotFoundException("Product category doesn't exists.");
         }
 
-        newProduct.setCategory(doesCategoryExists.get());
+        newProduct.setCategory(doesCategoryExists);
 
         Product productCreated = this.repository.save(newProduct);
 
@@ -114,14 +114,14 @@ public class ProductService {
         }
 
         if (product.getCategory() != null) {
-            Optional<Category> getCategory =
+            Category getCategory =
                     this.categoryService.filterCategoryById(product.getCategory().getId());
 
-            if (getCategory.isEmpty()) {
+            if (getCategory == null) {
                 throw new NotFoundException("New category not found.");
             }
 
-            product.setCategory(getCategory.get());
+            product.setCategory(getCategory);
         }
 
         Optional<Product> getProductBefore = this.repository.findById(product.getId());

@@ -3,10 +3,13 @@ package ecommerce.http.services.category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+
 import ecommerce.http.entities.Category;
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.ConflictException;
+import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.CategoryRepository;
+
 import java.util.Optional;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +61,59 @@ public class CategoryService {
         return formatCategories;
     }
 
-    public Optional<Category> filterCategoryById(@NonNull UUID categoryId) {
-        return this.repository.findById(categoryId);
+    public Category filterCategoryById(@NonNull UUID categoryId) {
+        if (categoryId == null) {
+            throw new BadRequestException("Invalid category id.");
+        }
+
+        Optional<Category> category = this.repository.findById(categoryId);
+
+        if (category.isEmpty()) {
+            throw new NotFoundException("Category not found.");
+        }
+
+        return category.get();
+    }
+
+    public void deleteCategory(UUID categoryId) {
+        if (categoryId == null) {
+            throw new BadRequestException("Invalid category id.");
+        }
+
+        int deletedCategory = this.repository.deleteByIdCustom(categoryId);
+
+        if (deletedCategory < 1) {
+            throw new NotFoundException("Category not found.");
+        }
+    }
+
+    public Category updateCategory(Category category) {
+        if (category == null) {
+            throw new BadRequestException("Invalid category.");
+        }
+
+        if (category.getId() == null) {
+            throw new BadRequestException("Invalid category id.");
+        }
+
+        String newName = category.getName();
+
+        Optional<Category> doesCategoryWithThisNameExists = this.repository.findByName(newName);
+
+        if (doesCategoryWithThisNameExists.isPresent()) {
+            throw new ConflictException("An category with this name already exists.");
+        }
+
+        Optional<Category> getCategoryToUpdate = this.repository.findById(category.getId());
+
+        if (getCategoryToUpdate.isEmpty()) {
+            throw new NotFoundException("Category not found.");
+        }
+
+        getCategoryToUpdate.get().setName(newName);
+
+        Category performUpdate = this.repository.save(getCategoryToUpdate.get());
+
+        return performUpdate;
     }
 }
