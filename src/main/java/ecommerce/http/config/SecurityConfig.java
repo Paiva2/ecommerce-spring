@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,6 +19,8 @@ public class SecurityConfig {
 
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+                // Admin only
                 String[] forbiddenPosts = {"/api/v1/category/*", "/api/v1/sku/*", "/api/v1/sku/**",
                                 "/api/v1/product/*"};
 
@@ -27,12 +30,14 @@ public class SecurityConfig {
                 String[] forbiddenDeletes =
                                 {"/api/v1/sku/**", "api/v1/product/**", "/api/v1/category/**"};
 
+                // Authenticated only
+                String[] authGets = {"/api/v1/clients/profile", "api/v1/clients/orders"};
+
                 return http.csrf(csrf -> csrf.disable())
                                 .sessionManagement(session -> session.sessionCreationPolicy(
                                                 SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(authorize -> authorize
-                                                .requestMatchers(HttpMethod.GET,
-                                                                "/api/v1/clients/profile")
+                                                .requestMatchers(HttpMethod.GET, authGets)
                                                 .authenticated()
                                                 .requestMatchers(HttpMethod.POST,
                                                                 "/api/v1/order/new")
@@ -44,6 +49,7 @@ public class SecurityConfig {
                                                 .hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.POST, forbiddenPosts)
                                                 .hasRole("ADMIN").anyRequest().permitAll())
+
                                 .addFilterBefore(securityFilter,
                                                 UsernamePasswordAuthenticationFilter.class)
                                 .build();

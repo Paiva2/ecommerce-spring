@@ -247,4 +247,12 @@ public class Client implements UserDetails {
     public void setWallet(ClientWallet wallet) {
         this.wallet = wallet;
     }
+
+    public Set<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(Set<Order> orders) {
+        this.orders = orders;
+    }
 }

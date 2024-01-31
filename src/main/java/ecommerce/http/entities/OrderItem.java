@@ -1,7 +1,7 @@
 package ecommerce.http.entities;
 
 import java.util.UUID;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 
 import jakarta.persistence.Column;
@@ -43,6 +43,7 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
+    @JsonIgnore
     @ManyToOne(targetEntity = Order.class, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "order_id")
     private Order order;

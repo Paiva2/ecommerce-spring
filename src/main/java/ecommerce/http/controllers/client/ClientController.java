@@ -2,6 +2,7 @@ package ecommerce.http.controllers.client;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import ecommerce.http.dtos.client.AuthClientDto;
@@ -9,14 +10,18 @@ import ecommerce.http.dtos.client.ForgotPasswordClientDto;
 import ecommerce.http.dtos.client.RegisterClientDto;
 import ecommerce.http.dtos.client.UpdateProfileDto;
 import ecommerce.http.entities.Client;
+import ecommerce.http.entities.Order;
+import ecommerce.http.enums.OrderStatus;
 import ecommerce.http.services.client.ClientService;
 import ecommerce.http.services.jwt.JwtService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -95,6 +100,20 @@ public class ClientController {
                 UUID.fromString(parseToken));
 
         return ResponseEntity.ok().body(Collections.singletonMap("message", update));
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<Page<Set<Order>>> getOrders(
+            @RequestHeader("Authorization") String authToken,
+            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(name = "perPage", required = false, defaultValue = "5") Integer perPage,
+            @RequestParam(name = "status", required = false) OrderStatus status) {
+        String userId = this.jwtService.validateToken(authToken);
+
+        Page<Set<Order>> orders =
+                this.clientService.getAllOrders(UUID.fromString(userId), page, perPage, status);
+
+        return ResponseEntity.ok().body(orders);
     }
 
 }

@@ -3,25 +3,34 @@ package ecommerce.http.services.client;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ecommerce.http.repositories.ClientRepository;
+import ecommerce.http.repositories.OrderRepository;
 import ecommerce.http.services.wallet.WalletService;
+
 import ecommerce.http.entities.Client;
 import ecommerce.http.entities.ClientWallet;
+import ecommerce.http.entities.Order;
+
+import ecommerce.http.enums.OrderStatus;
+
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.ConflictException;
 import ecommerce.http.exceptions.ForbiddenException;
 import ecommerce.http.exceptions.NotAllowedException;
 import ecommerce.http.exceptions.NotFoundException;
 
+import org.springframework.data.domain.Page;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import java.beans.PropertyDescriptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,11 +41,16 @@ public class ClientService {
     @Autowired
     private final WalletService walletService;
 
+    @Autowired
+    private final OrderRepository orderRepository;
+
     private final BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder(6);
 
-    public ClientService(ClientRepository repository, WalletService walletService) {
+    public ClientService(ClientRepository repository, WalletService walletService,
+            OrderRepository orderRepository) {
         this.repository = repository;
         this.walletService = walletService;
+        this.orderRepository = orderRepository;
     }
 
     public Client auth(Client client) {
@@ -238,6 +252,40 @@ public class ClientService {
         Client performUpdate = this.repository.save(getCurrentProfile.get());
 
         return performUpdate;
+    }
+
+    public Page<Set<Order>> getAllOrders(UUID clientId, Integer page, Integer perPage,
+            OrderStatus status) {
+        if (clientId == null) {
+            throw new BadRequestException("Invalid client id.");
+        }
+
+        if (page < 1) {
+            page = 1;
+        }
+
+        if (perPage < 5) {
+            perPage = 5;
+        }
+
+        Optional<Client> getClient = this.repository.findById(clientId);
+
+        if (getClient.isEmpty()) {
+            throw new NotFoundException("User not found.");
+        }
+
+        PageRequest pageable = PageRequest.of(page - 1, perPage);
+
+        Page<Set<Order>> clientOrders;
+
+        if (status == null) {
+            clientOrders =
+                    this.orderRepository.getOrdersByUserId(getClient.get().getId(), pageable);
+        } else {
+            clientOrders = this.orderRepository.getOrdersByUserIdAndStatus(getClient.get().getId(),
+                    pageable, status);
+        }
+        return clientOrders;
     }
 
     protected Boolean checkOldAndNew(String oldProp, String newProp, String propName) {

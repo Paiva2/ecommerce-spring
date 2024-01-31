@@ -12,7 +12,7 @@ Java-based application built using the Spring framework. The system is designed 
 - [x] It must be possible to update profile dynamically.
 - [x] It must be possible to buy an product.
 - [x] Each client has your own wallet.
-- [x] Perform Wallet transactions with products.
+- [x] Perform Wallet transactions with products and orders.
 - [ ] Manage your own orders.
 - [ ] Manage your owns coupons.
 - [ ] All entities validations.
