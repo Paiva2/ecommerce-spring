@@ -2,6 +2,7 @@ package ecommerce.http.entities;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.hibernate.annotations.OnDelete;
@@ -19,7 +20,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -49,10 +50,13 @@ public class Client implements UserDetails {
     @Column(nullable = false, updatable = true)
     private UserRole role = UserRole.USER;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "wallet_id", referencedColumnName = "id")
     private ClientWallet wallet;
+
+    @OneToMany(mappedBy = "client")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Order> orders;
 
     @Transient
     private String newPassword;

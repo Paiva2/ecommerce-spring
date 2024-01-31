@@ -3,13 +3,17 @@ package ecommerce.http.entities;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
-
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -28,7 +32,9 @@ public class ClientWallet {
     private Instant updatedAt;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "wallet")
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "wallet_owner_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Client client;
 
     public ClientWallet() {}
@@ -63,6 +69,10 @@ public class ClientWallet {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public void withdraw(BigDecimal value) {
+        this.amount = this.amount.subtract(value);
     }
 }
 

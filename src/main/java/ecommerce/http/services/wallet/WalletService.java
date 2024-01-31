@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ecommerce.http.entities.Client;
 import ecommerce.http.entities.ClientWallet;
 import ecommerce.http.repositories.WalletRepository;
 
@@ -19,10 +20,11 @@ public class WalletService {
         this.walletRepository = walletRepository;
     }
 
-    public ClientWallet generateWallet() {
+    public ClientWallet generateWallet(Client walletOwner) {
         ClientWallet wallet = new ClientWallet();
 
         wallet.setAmount(INITIAL_AMOUNT);
+        wallet.setClient(walletOwner);
 
         this.walletRepository.save(wallet);
 

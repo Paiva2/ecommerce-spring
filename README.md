@@ -21,9 +21,8 @@ Java-based application built using the Spring framework. The system is designed 
 
 - [x] It must be possible to perform CRUD operations in a product.
 - [x] It must be possible to insert a new SKU to an product.
-- [ ] It must be possible to perform CRUD operations in a category.
+- [x] It must be possible to perform CRUD operations in a category.
 - [x] It must be possible to filter products with dynamic queries such as active, category, name, color, sizes, gender etc.
-- [ ] Paginated lists.
 - [ ] Give an determined amount to an user wallet.
 - [ ] Give users coupons to use.
 - [ ] Refund an purchase.

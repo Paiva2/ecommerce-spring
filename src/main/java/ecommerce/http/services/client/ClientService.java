@@ -10,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ecommerce.http.repositories.ClientRepository;
 import ecommerce.http.services.wallet.WalletService;
 import ecommerce.http.entities.Client;
-
+import ecommerce.http.entities.ClientWallet;
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.ConflictException;
 import ecommerce.http.exceptions.ForbiddenException;
@@ -74,7 +74,8 @@ public class ClientService {
         String hashedPassword = bcrypt.encode(client.getPassword());
 
         client.setPassword(hashedPassword);
-        client.setWallet(this.walletService.generateWallet());
+        ClientWallet userWallet = this.walletService.generateWallet(client);
+        client.setWallet(userWallet);
 
         Client createdClient = this.repository.save(client);
 

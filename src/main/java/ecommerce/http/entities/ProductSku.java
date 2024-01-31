@@ -58,12 +58,11 @@ public class ProductSku {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public ProductSku() {
-    }
+    public ProductSku() {}
 
     // Creation DTO
     public ProductSku(String color, String size, BigDecimal price, Integer quantity,
-                      Gender gender) {
+            Gender gender) {
         this.color = color;
         this.size = size;
         this.price = price;
@@ -73,7 +72,7 @@ public class ProductSku {
 
     // Update DTO
     public ProductSku(Boolean active, Boolean isOnSale, BigDecimal price, Integer quantity,
-                      String color, Gender gender, String size, BigDecimal priceOnsale) {
+            String color, Gender gender, String size, BigDecimal priceOnsale) {
         this.active = active;
         this.isOnSale = isOnSale;
         this.price = price;
@@ -178,5 +177,9 @@ public class ProductSku {
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public void subtractQuantity(Integer valueToSubtract) {
+        this.quantity = this.quantity - valueToSubtract;
     }
 }
