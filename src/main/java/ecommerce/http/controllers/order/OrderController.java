@@ -1,13 +1,12 @@
 package ecommerce.http.controllers.order;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ecommerce.http.dtos.order.NewOrderDto;
-import ecommerce.http.entities.Order;
-import ecommerce.http.entities.OrderItem;
+import ecommerce.http.dtos.order.utils.FormatNewOrderDto;
 import ecommerce.http.services.jwt.JwtService;
 import ecommerce.http.services.order.OrderService;
 
@@ -42,30 +40,15 @@ public class OrderController {
             @RequestHeader("Authorization") String authToken) {
         String userToken = jwtService.validateToken(authToken);
 
-        // TODO: MOVE THIS LOGIC FROM HERE
-        Order newOrder = new Order();
-
         Set<NewOrderDto> dtoItems = newOrderDto.get("order");
 
-        Set<OrderItem> orderItems = new HashSet<>();
+        FormatNewOrderDto formatOrderDto = new FormatNewOrderDto(dtoItems);
 
-        dtoItems.forEach(item -> {
-            System.out.println(item.getSkuId());
+        formatOrderDto.insertItemsOnOrder();
 
-            OrderItem orderItem = new OrderItem();
-
-            orderItem.setSkuId(UUID.fromString(item.getSkuId()));
-            orderItem.setProductId(UUID.fromString(item.getProductId()));
-            orderItem.setQuantity(item.getQuantity());
-
-            orderItems.add(orderItem);
-        });
-
-        newOrder.setItems(orderItems);
-
-        this.orderService.newOrder(newOrder, userToken);
+        this.orderService.newOrder(formatOrderDto.getOrder(), userToken);
 
         return ResponseEntity.status(201)
-                .body(Collections.singletonMap("message", "Order made successfully!"));
+                .body(Collections.singletonMap("message", "Order created successfully!"));
     }
 }

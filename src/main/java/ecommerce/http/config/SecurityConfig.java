@@ -34,6 +34,9 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/api/v1/clients/profile")
                                                 .authenticated()
+                                                .requestMatchers(HttpMethod.POST,
+                                                                "/api/v1/order/new")
+                                                .authenticated()
                                                 .requestMatchers(HttpMethod.PATCH, forbiddenPatchs)
                                                 .hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.DELETE,

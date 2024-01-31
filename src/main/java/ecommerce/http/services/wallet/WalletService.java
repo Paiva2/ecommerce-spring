@@ -1,12 +1,16 @@
 package ecommerce.http.services.wallet;
 
 import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ecommerce.http.entities.Client;
 import ecommerce.http.entities.ClientWallet;
+import ecommerce.http.exceptions.BadRequestException;
+import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.repositories.WalletRepository;
 
 @Service
@@ -29,5 +33,21 @@ public class WalletService {
         this.walletRepository.save(wallet);
 
         return wallet;
+    }
+
+    public void withdrawValue(BigDecimal valueToSubtract, UUID walletId) {
+        if (walletId == null) {
+            throw new BadRequestException("Invalid wallet id.");
+        }
+
+        Optional<ClientWallet> clientWallet = this.walletRepository.findById(walletId);
+
+        if (clientWallet.isEmpty()) {
+            throw new NotFoundException("Client wallet not found.");
+        }
+
+        clientWallet.get().withdraw(valueToSubtract);
+
+        this.walletRepository.save(clientWallet.get());
     }
 }
