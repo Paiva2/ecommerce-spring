@@ -9,6 +9,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import ecommerce.http.entities.Client;
 import ecommerce.http.entities.Order;
@@ -17,6 +19,7 @@ import ecommerce.http.entities.ProductSku;
 import ecommerce.http.enums.OrderStatus;
 
 import ecommerce.http.exceptions.BadRequestException;
+import ecommerce.http.exceptions.ConflictException;
 import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.exceptions.PaymentRequiredException;
 
@@ -115,5 +118,112 @@ public class OrderService {
 
         return performOrderCreation;
     }
+
+    @Transactional
+    public void handleApproveOrder(UUID orderId) {
+        if (orderId == null) {
+            throw new BadRequestException("Invalid order id.");
+        }
+
+        Optional<Order> getOrder = this.orderRepository.findById(orderId);
+
+        if (getOrder.isEmpty()) {
+            throw new NotFoundException("Order not found.");
+        }
+
+        Order orderToHandle = getOrder.get();
+
+        OrderStatus orderCurrentStatus = orderToHandle.getStatus();
+
+        if (orderCurrentStatus.equals(OrderStatus.APPROVED)) {
+            throw new ConflictException("Order is already approved.");
+        }
+
+        Optional<Client> getOrderOwner =
+                this.clientRepository.findById(orderToHandle.getClient().getId());
+
+        if (getOrderOwner.isEmpty()) {
+            throw new NotFoundException("Order owner not found.");
+        }
+
+        if (orderCurrentStatus.equals(OrderStatus.CANCELLED)) {
+            Set<ProductSku> orderItems = new HashSet<>();
+
+            orderToHandle.getItems().forEach(item -> {
+                ProductSku orderItemUpdated =
+                        this.orderItemService.handleOrderItemQuantity(item, "subtract");
+
+                orderItems.add(orderItemUpdated);
+            });
+
+            this.productSkuRepository.saveAll(orderItems);
+        }
+
+        orderToHandle.setStatus(OrderStatus.APPROVED);
+
+        this.orderRepository.save(orderToHandle);
+
+        this.walletService.withdrawValue(orderToHandle.getTotal(),
+                getOrderOwner.get().getWallet().getId());
+    }
+
+    @Transactional
+    public void denyPendingOrder(UUID orderId) {
+        if (orderId == null) {
+            throw new BadRequestException("Invalid order id.");
+        }
+
+        Optional<Order> getOrder = this.orderRepository.findById(orderId);
+
+        if (getOrder.isEmpty()) {
+            throw new NotFoundException("Order not found");
+        }
+
+        Order orderToHandle = getOrder.get();
+
+        if (orderToHandle.getStatus().equals(OrderStatus.CANCELLED)) {
+            throw new ConflictException("Order is already cancelled.");
+        }
+
+        if (orderToHandle.getStatus().equals(OrderStatus.APPROVED)) {
+            throw new ConflictException("Order is already approved.");
+        }
+
+        Set<ProductSku> itemsList = new HashSet<>();
+
+        orderToHandle.getItems().forEach(orderItem -> {
+            ProductSku orderItemUpdated =
+                    this.orderItemService.handleOrderItemQuantity(orderItem, "increase");
+
+            itemsList.add(orderItemUpdated);
+        });
+
+        orderToHandle.setStatus(OrderStatus.CANCELLED);
+
+        this.productSkuRepository.saveAll(itemsList);
+    }
+
+    public Page<Order> ListAllOrders(Integer page, Integer perPage, OrderStatus status) {
+        if (page < 1) {
+            page = 1;
+        }
+
+        if (perPage < 5) {
+            perPage = 5;
+        }
+
+        PageRequest pageable = PageRequest.of((page - 1), perPage);
+
+        Page<Order> orders = null;
+
+        if (status != null) {
+            orders = this.orderRepository.findByStatus(status, pageable);
+        } else {
+            orders = this.orderRepository.findAll(pageable);
+        }
+
+        return orders;
+    }
+
 
 }

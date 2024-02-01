@@ -1,8 +1,7 @@
 package ecommerce.http.enums;
 
 public enum OrderStatus {
-    PENDING("pending"), APPROVED("approved"), FINISHED("finished"), CANCELLED(
-            "cancelled"), REFOUNDED("refounded");
+    PENDING("pending"), APPROVED("approved"), CANCELLED("cancelled"), REFUNDED("refunded");
 
     private String status;
 

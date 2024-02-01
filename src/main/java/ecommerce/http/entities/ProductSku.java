@@ -182,4 +182,8 @@ public class ProductSku {
     public void subtractQuantity(Integer valueToSubtract) {
         this.quantity = this.quantity - valueToSubtract;
     }
+
+    public void increaseQuantity(Integer valuetToIncrease) {
+        this.quantity = this.quantity + valuetToIncrease;
+    }
 }

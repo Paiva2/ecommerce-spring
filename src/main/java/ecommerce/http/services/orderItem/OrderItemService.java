@@ -1,6 +1,7 @@
 package ecommerce.http.services.orderItem;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,16 +14,27 @@ import ecommerce.http.entities.ProductSku;
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.ConflictException;
 import ecommerce.http.exceptions.NotFoundException;
-
+import ecommerce.http.repositories.OrderItemRepository;
 import ecommerce.http.repositories.ProductRepository;
+import ecommerce.http.repositories.ProductSkuRepository;
 
 @Service
 public class OrderItemService {
     @Autowired
     private final ProductRepository productRepository;
 
-    public OrderItemService(ProductRepository productRepository) {
+    @Autowired
+    private final OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private final ProductSkuRepository productSkuRepository;
+
+    public OrderItemService(ProductRepository productRepository,
+            OrderItemRepository orderItemRepository, ProductSkuRepository productSkuRepository) {
         this.productRepository = productRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.productSkuRepository = productSkuRepository;
+
     }
 
     public OrderItem newOrderItem(Order order, OrderItem orderItem, Set<ProductSku> orderSkuList) {
@@ -70,5 +82,35 @@ public class OrderItemService {
         orderSkuList.add(orderSku);
 
         return orderItem;
+    }
+
+    public ProductSku handleOrderItemQuantity(OrderItem orderItem, String action) {
+        if (orderItem == null) {
+            throw new BadRequestException("Invalid order item");
+        }
+
+        Optional<OrderItem> doesItemExists = this.orderItemRepository.findById(orderItem.getId());
+
+        if (doesItemExists.isEmpty()) {
+            throw new NotFoundException("An item from this order wasn't found.");
+        }
+
+        OrderItem getItem = doesItemExists.get();
+
+        Optional<ProductSku> getItemSku = this.productSkuRepository.findById(getItem.getSkuId());
+
+        if (getItemSku.isEmpty()) {
+            throw new NotFoundException("Item sku not found.");
+        }
+
+        if (action.equals("subtract")) {
+            getItemSku.get().subtractQuantity(orderItem.getQuantity());
+        }
+
+        if (action.equals("increase")) {
+            getItemSku.get().increaseQuantity(orderItem.getQuantity());
+        }
+
+        return getItemSku.get();
     }
 }

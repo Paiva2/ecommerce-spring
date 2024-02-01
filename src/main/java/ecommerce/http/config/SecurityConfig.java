@@ -25,10 +25,12 @@ public class SecurityConfig {
                                 "/api/v1/product/*"};
 
                 String[] forbiddenPatchs = {"/api/v1/product/*", "/api/v1/sku/**",
-                                "/api/v1/product/*", "/api/v1/category/**"};
+                                "/api/v1/product/*", "/api/v1/category/**", "/api/v1/order/**"};
 
                 String[] forbiddenDeletes =
                                 {"/api/v1/sku/**", "api/v1/product/**", "/api/v1/category/**"};
+
+                String[] forbiddenGets = {"/api/v1/order/*"};
 
                 // Authenticated only
                 String[] authGets = {"/api/v1/clients/profile", "api/v1/clients/orders"};
@@ -38,6 +40,8 @@ public class SecurityConfig {
                                                 SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .requestMatchers(HttpMethod.GET, authGets)
+                                                .authenticated()
+                                                .requestMatchers(HttpMethod.GET, forbiddenGets)
                                                 .authenticated()
                                                 .requestMatchers(HttpMethod.POST,
                                                                 "/api/v1/order/new")
