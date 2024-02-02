@@ -35,12 +35,34 @@ public class WalletService {
         return wallet;
     }
 
-    public void handleAmount(BigDecimal value, UUID walletId, String action) {
-        if (walletId == null) {
+    public void handleAmount(BigDecimal value, UUID walletId, String action, UUID clientId) {
+        if (walletId == null && clientId == null) {
             throw new BadRequestException("Invalid wallet id.");
         }
 
-        Optional<ClientWallet> clientWallet = this.walletRepository.findById(walletId);
+        if (action == null) {
+            throw new BadRequestException("You must provide an action.");
+        }
+
+        if (value == null) {
+            throw new BadRequestException("Invalid value.");
+        }
+
+        UUID findForWallet;
+
+        if (clientId != null) {
+            Optional<ClientWallet> getClientWallet = this.walletRepository.findByClientId(clientId);
+
+            if (getClientWallet.isEmpty()) {
+                throw new NotFoundException("Wallet from provided client id not found.");
+            }
+
+            findForWallet = getClientWallet.get().getId();
+        } else {
+            findForWallet = walletId;
+        }
+
+        Optional<ClientWallet> clientWallet = this.walletRepository.findById(findForWallet);
 
         if (clientWallet.isEmpty()) {
             throw new NotFoundException("Client wallet not found.");
@@ -52,7 +74,6 @@ public class WalletService {
         } else if (action.equals("insert")) {
             clientWallet.get().insert(value);
         }
-
 
         this.walletRepository.save(clientWallet.get());
     }

@@ -28,7 +28,7 @@ Java-based application built using the Spring framework. The system is designed 
 - [x] It must be possible to perform CRUD operations in a category.
 - [x] It must be possible to filter products with dynamic queries such as active, category, name, color, sizes, gender etc.
 - [x] List all orders already made.
-- [ ] Give an determined amount to an user wallet.
+- [x] Give an determined amount to an user wallet.
 - [ ] Give users coupons to use.
 - [x] Aprove/refuse orders.
 - [x] Refund an purchase.

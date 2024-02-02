@@ -114,8 +114,8 @@ public class OrderService {
         }
 
         if (performOrderCreation != null) {
-            this.walletService.handleAmount(orderTotal, orderClient.getWallet().getId(),
-                    "subtract");
+            this.walletService.handleAmount(orderTotal, orderClient.getWallet().getId(), "subtract",
+                    null);
         }
 
         return performOrderCreation;
@@ -166,7 +166,7 @@ public class OrderService {
         this.orderRepository.save(orderToHandle);
 
         this.walletService.handleAmount(orderToHandle.getTotal(),
-                getOrderOwner.get().getWallet().getId(), "subtract");
+                getOrderOwner.get().getWallet().getId(), "subtract", null);
     }
 
     @Transactional
@@ -263,7 +263,7 @@ public class OrderService {
         OrderStatus defineStatus = willApprove ? OrderStatus.REFUNDED : OrderStatus.DENIED_REFUND;
 
         if (willApprove) {
-            this.walletService.handleAmount(orderTotal, clientWalletId, "insert");
+            this.walletService.handleAmount(orderTotal, clientWalletId, "insert", null);
 
             Set<ProductSku> orderItemsSkus = new HashSet<>();
 

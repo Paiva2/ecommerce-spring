@@ -24,9 +24,9 @@ public class SecurityConfig {
                 String[] forbiddenPosts =
                                 {"/api/v1/category/*", "/api/v1/sku/**", "/api/v1/product/*"};
 
-                String[] forbiddenPatchs =
-                                {"/api/v1/product/*", "/api/v1/sku/**", "/api/v1/category/**",
-                                                "/api/v1/order/**", "/api/v1/order/refund/**"};
+                String[] forbiddenPatchs = {"/api/v1/product/*", "/api/v1/sku/**",
+                                "/api/v1/category/**", "/api/v1/order/**",
+                                "/api/v1/order/refund/**", "/api/v1/wallet/**"};
 
                 String[] forbiddenDeletes =
                                 {"/api/v1/sku/**", "api/v1/product/**", "/api/v1/category/**"};
