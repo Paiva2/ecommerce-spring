@@ -58,6 +58,10 @@ public class Client implements UserDetails {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Order> orders;
 
+    @OneToMany(mappedBy = "client")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Coupon> coupon;
+
     @Transient
     private String newPassword;
 
@@ -255,4 +259,14 @@ public class Client implements UserDetails {
     public void setOrders(Set<Order> orders) {
         this.orders = orders;
     }
+
+    public Set<Coupon> getCoupon() {
+        return coupon;
+    }
+
+    public void setCoupon(Set<Coupon> coupon) {
+        this.coupon = coupon;
+    }
+
+
 }

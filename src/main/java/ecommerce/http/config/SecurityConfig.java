@@ -21,8 +21,8 @@ public class SecurityConfig {
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
                 // Admin only
-                String[] forbiddenPosts =
-                                {"/api/v1/category/*", "/api/v1/sku/**", "/api/v1/product/*"};
+                String[] forbiddenPosts = {"/api/v1/category/*", "/api/v1/sku/**",
+                                "/api/v1/product/*", "/api/v1/coupon/**"};
 
                 String[] forbiddenPatchs = {"/api/v1/product/*", "/api/v1/sku/**",
                                 "/api/v1/category/**", "/api/v1/order/**",
