@@ -1,6 +1,7 @@
 package ecommerce.http.controllers.client;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import ecommerce.http.dtos.client.ForgotPasswordClientDto;
 import ecommerce.http.dtos.client.RegisterClientDto;
 import ecommerce.http.dtos.client.UpdateProfileDto;
 import ecommerce.http.entities.Client;
+import ecommerce.http.entities.Coupon;
 import ecommerce.http.entities.Order;
 import ecommerce.http.enums.OrderStatus;
 import ecommerce.http.services.client.ClientService;
@@ -127,4 +129,17 @@ public class ClientController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/coupons")
+    public ResponseEntity<Map<String, Set<Coupon>>> listAllCoupons(
+            @RequestHeader("Authorization") String authToken) {
+        String tokenParsed = this.jwtService.validateToken(authToken);
+
+        Set<Coupon> coupons = this.clientService.listCoupons(UUID.fromString(tokenParsed));
+
+        Map<String, Set<Coupon>> response = new HashMap<>();
+
+        response.put("coupons", coupons);
+
+        return ResponseEntity.ok().body(response);
+    }
 }

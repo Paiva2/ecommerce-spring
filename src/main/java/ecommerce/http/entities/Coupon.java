@@ -1,7 +1,6 @@
 package ecommerce.http.entities;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,6 +37,9 @@ public class Coupon {
     @Column(nullable = false)
     private Boolean active;
 
+    @Column(nullable = false)
+    private String code;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -51,11 +53,14 @@ public class Coupon {
     @JoinColumn(name = "client_id")
     private Client client;
 
+    public Coupon() {}
+
     // give coupon DTO
-    public Coupon(Double value, String validUntil, Boolean active) {
+    public Coupon(Double value, String validUntil, Boolean active, String code) {
         this.value = value;
         this.validUntil = validUntil;
         this.active = active;
+        this.code = code;
     }
 
     public UUID getId() {
@@ -112,5 +117,13 @@ public class Coupon {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

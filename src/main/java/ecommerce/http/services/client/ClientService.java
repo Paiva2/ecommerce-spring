@@ -14,6 +14,7 @@ import ecommerce.http.services.wallet.WalletService;
 
 import ecommerce.http.entities.Client;
 import ecommerce.http.entities.ClientWallet;
+import ecommerce.http.entities.Coupon;
 import ecommerce.http.entities.Order;
 
 import ecommerce.http.enums.OrderStatus;
@@ -28,7 +29,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import java.beans.PropertyDescriptor;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -310,6 +310,22 @@ public class ClientService {
         order.setStatus(OrderStatus.PENDING_REFUND);
 
         this.orderRepository.save(order);
+    }
+
+    public Set<Coupon> listCoupons(UUID userId) {
+        if (userId == null) {
+            throw new BadRequestException("Invalid user id.");
+        }
+
+        Optional<Client> doesClientExists = this.repository.findById(userId);
+
+        if (doesClientExists.isEmpty()) {
+            throw new NotFoundException("Client not found.");
+        }
+
+        Client client = doesClientExists.get();
+
+        return client.getCoupons();
     }
 
     protected Boolean checkOldAndNew(String oldProp, String newProp, String propName) {

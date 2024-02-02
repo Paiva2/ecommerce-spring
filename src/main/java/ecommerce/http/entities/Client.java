@@ -60,7 +60,7 @@ public class Client implements UserDetails {
 
     @OneToMany(mappedBy = "client")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<Coupon> coupon;
+    private Set<Coupon> coupons;
 
     @Transient
     private String newPassword;
@@ -260,13 +260,11 @@ public class Client implements UserDetails {
         this.orders = orders;
     }
 
-    public Set<Coupon> getCoupon() {
-        return coupon;
+    public Set<Coupon> getCoupons() {
+        return coupons;
     }
 
-    public void setCoupon(Set<Coupon> coupon) {
-        this.coupon = coupon;
+    public void setCoupons(Set<Coupon> coupon) {
+        this.coupons = coupon;
     }
-
-
 }
