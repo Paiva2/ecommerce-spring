@@ -20,6 +20,7 @@ import ecommerce.http.enums.OrderStatus;
 
 import ecommerce.http.exceptions.BadRequestException;
 import ecommerce.http.exceptions.ConflictException;
+import ecommerce.http.exceptions.NotAllowedException;
 import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.exceptions.PaymentRequiredException;
 
@@ -96,10 +97,10 @@ public class OrderService {
 
         BigDecimal orderTotal = new BigDecimal(order.getTotal().toString());
 
-        Boolean userHasNecessaryAmount = userWalletAmount.compareTo(orderTotal) > 0;
+        Boolean userHasNecessaryAmount = userWalletAmount.compareTo(orderTotal) >= 0;
 
         OrderStatus orderStatus =
-                userHasNecessaryAmount ? OrderStatus.APPROVED : OrderStatus.PENDING;
+                userHasNecessaryAmount ? OrderStatus.FINISHED : OrderStatus.PENDING;
 
         order.setStatus(orderStatus);
 
@@ -113,7 +114,8 @@ public class OrderService {
         }
 
         if (performOrderCreation != null) {
-            this.walletService.withdrawValue(orderTotal, orderClient.getWallet().getId());
+            this.walletService.handleAmount(orderTotal, orderClient.getWallet().getId(),
+                    "subtract");
         }
 
         return performOrderCreation;
@@ -135,8 +137,8 @@ public class OrderService {
 
         OrderStatus orderCurrentStatus = orderToHandle.getStatus();
 
-        if (orderCurrentStatus.equals(OrderStatus.APPROVED)) {
-            throw new ConflictException("Order is already approved.");
+        if (orderCurrentStatus.equals(OrderStatus.FINISHED)) {
+            throw new ConflictException("Order is already finished.");
         }
 
         Optional<Client> getOrderOwner =
@@ -159,12 +161,12 @@ public class OrderService {
             this.productSkuRepository.saveAll(orderItems);
         }
 
-        orderToHandle.setStatus(OrderStatus.APPROVED);
+        orderToHandle.setStatus(OrderStatus.FINISHED);
 
         this.orderRepository.save(orderToHandle);
 
-        this.walletService.withdrawValue(orderToHandle.getTotal(),
-                getOrderOwner.get().getWallet().getId());
+        this.walletService.handleAmount(orderToHandle.getTotal(),
+                getOrderOwner.get().getWallet().getId(), "subtract");
     }
 
     @Transactional
@@ -185,8 +187,8 @@ public class OrderService {
             throw new ConflictException("Order is already cancelled.");
         }
 
-        if (orderToHandle.getStatus().equals(OrderStatus.APPROVED)) {
-            throw new ConflictException("Order is already approved.");
+        if (orderToHandle.getStatus().equals(OrderStatus.FINISHED)) {
+            throw new ConflictException("Order is already finished.");
         }
 
         Set<ProductSku> itemsList = new HashSet<>();
@@ -225,5 +227,58 @@ public class OrderService {
         return orders;
     }
 
+    @Transactional
+    public void handlePendingRefund(UUID orderId, Boolean willApprove) {
+        if (orderId == null) {
+            throw new BadRequestException("Invalid order id.");
+        }
 
+        if (willApprove == null) {
+            throw new BadRequestException("You must provide an valid action to pending refund.");
+        }
+
+        Optional<Order> doesOrderExists = this.orderRepository.findById(orderId);
+
+        if (doesOrderExists.isEmpty()) {
+            throw new NotFoundException("Order not found.");
+        }
+
+        Order order = doesOrderExists.get();
+
+        if (!order.getStatus().equals(OrderStatus.PENDING_REFUND)) {
+            throw new NotAllowedException(
+                    "You can only refund orders that are pending for refund.");
+        }
+
+        BigDecimal orderTotal = order.getTotal();
+
+        Optional<Client> getOrderClient = this.clientRepository.findById(order.getClient().getId());
+
+        if (getOrderClient.isEmpty()) {
+            throw new NotFoundException("Order owner not found.");
+        }
+
+        UUID clientWalletId = getOrderClient.get().getWallet().getId();
+
+        OrderStatus defineStatus = willApprove ? OrderStatus.REFUNDED : OrderStatus.DENIED_REFUND;
+
+        if (willApprove) {
+            this.walletService.handleAmount(orderTotal, clientWalletId, "insert");
+
+            Set<ProductSku> orderItemsSkus = new HashSet<>();
+
+            order.getItems().forEach(item -> {
+                ProductSku itemUpdated =
+                        this.orderItemService.handleOrderItemQuantity(item, "increase");
+
+                orderItemsSkus.add(itemUpdated);
+            });
+
+            this.productSkuRepository.saveAll(orderItemsSkus);
+        }
+
+        order.setStatus(defineStatus);
+
+        this.orderRepository.save(order);
+    }
 }

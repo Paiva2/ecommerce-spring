@@ -69,6 +69,16 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/refund/{orderId}")
+    public ResponseEntity<Object> manageRefundSolicitations(
+            @Valid @PathVariable(name = "orderId", required = true) UUID orderId,
+            @RequestParam(name = "approve", required = true) Boolean willApprove) {
+
+        this.orderService.handlePendingRefund(orderId, willApprove);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/deny/{orderId}")
     public ResponseEntity<Object> denyOrder(
             @Valid @PathVariable(name = "orderId", required = true) UUID orderId) {

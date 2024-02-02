@@ -288,6 +288,30 @@ public class ClientService {
         return clientOrders;
     }
 
+    public void requestRefund(UUID orderId) {
+        if (orderId == null) {
+            throw new BadRequestException("Invalid order id.");
+        }
+
+        Optional<Order> doesOrderExists = this.orderRepository.findById(orderId);
+
+        if (doesOrderExists.isEmpty()) {
+            throw new NotFoundException("Order not found.");
+        }
+
+        Order order = doesOrderExists.get();
+
+        if (!order.getStatus().equals(OrderStatus.FINISHED)
+                || order.getStatus().equals(OrderStatus.PENDING_REFUND)) {
+            throw new NotAllowedException(
+                    "You can only request refund on orders that are already finished.");
+        }
+
+        order.setStatus(OrderStatus.PENDING_REFUND);
+
+        this.orderRepository.save(order);
+    }
+
     protected Boolean checkOldAndNew(String oldProp, String newProp, String propName) {
         if (oldProp != null && newProp == null) {
             throw new BadRequestException("Invalid new " + propName);

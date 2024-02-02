@@ -35,7 +35,7 @@ public class WalletService {
         return wallet;
     }
 
-    public void withdrawValue(BigDecimal valueToSubtract, UUID walletId) {
+    public void handleAmount(BigDecimal value, UUID walletId, String action) {
         if (walletId == null) {
             throw new BadRequestException("Invalid wallet id.");
         }
@@ -46,8 +46,15 @@ public class WalletService {
             throw new NotFoundException("Client wallet not found.");
         }
 
-        clientWallet.get().withdraw(valueToSubtract);
+        if (action.equals("subtract")) {
+            clientWallet.get().withdraw(value);
+
+        } else if (action.equals("insert")) {
+            clientWallet.get().insert(value);
+        }
+
 
         this.walletRepository.save(clientWallet.get());
     }
+
 }

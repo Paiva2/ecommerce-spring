@@ -21,19 +21,21 @@ public class SecurityConfig {
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
                 // Admin only
-                String[] forbiddenPosts = {"/api/v1/category/*", "/api/v1/sku/*", "/api/v1/sku/**",
-                                "/api/v1/product/*"};
+                String[] forbiddenPosts =
+                                {"/api/v1/category/*", "/api/v1/sku/**", "/api/v1/product/*"};
 
-                String[] forbiddenPatchs = {"/api/v1/product/*", "/api/v1/sku/**",
-                                "/api/v1/product/*", "/api/v1/category/**", "/api/v1/order/**"};
+                String[] forbiddenPatchs =
+                                {"/api/v1/product/*", "/api/v1/sku/**", "/api/v1/category/**",
+                                                "/api/v1/order/**", "/api/v1/order/refund/**"};
 
                 String[] forbiddenDeletes =
                                 {"/api/v1/sku/**", "api/v1/product/**", "/api/v1/category/**"};
 
-                String[] forbiddenGets = {"/api/v1/order/*"};
+                String[] forbiddenGets = {"/api/v1/order/list/**"};
 
                 // Authenticated only
                 String[] authGets = {"/api/v1/clients/profile", "api/v1/clients/orders"};
+                String[] authPatchs = {"/api/v1/clients/refund/*"};
 
                 return http.csrf(csrf -> csrf.disable())
                                 .sessionManagement(session -> session.sessionCreationPolicy(
@@ -41,8 +43,10 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .requestMatchers(HttpMethod.GET, authGets)
                                                 .authenticated()
-                                                .requestMatchers(HttpMethod.GET, forbiddenGets)
+                                                .requestMatchers(HttpMethod.PATCH, authPatchs)
                                                 .authenticated()
+                                                .requestMatchers(HttpMethod.GET, forbiddenGets)
+                                                .hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.POST,
                                                                 "/api/v1/order/new")
                                                 .authenticated()

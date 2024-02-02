@@ -74,5 +74,9 @@ public class ClientWallet {
     public void withdraw(BigDecimal value) {
         this.amount = this.amount.subtract(value);
     }
+
+    public void insert(BigDecimal value) {
+        this.amount = this.amount.add(value);
+    }
 }
 
