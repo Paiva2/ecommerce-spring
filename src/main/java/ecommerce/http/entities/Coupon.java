@@ -1,6 +1,8 @@
 package ecommerce.http.entities;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -125,5 +127,13 @@ public class Coupon {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public Boolean isCouponValid() throws Exception {
+        LocalDateTime couponDateTime = LocalDateTime.parse(this.validUntil);
+        Instant couponInstant = couponDateTime.atZone(ZoneId.systemDefault()).toInstant();
+        int couponDateIsPast = couponInstant.compareTo(Instant.now());
+
+        return couponDateIsPast > 0;
     }
 }

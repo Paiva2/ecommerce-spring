@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ecommerce.http.dtos.order.NewOrderDto;
+import ecommerce.http.dtos.order.NewOrderItemsDto;
 import ecommerce.http.dtos.order.utils.FormatNewOrderDto;
 import ecommerce.http.entities.Order;
 import ecommerce.http.enums.OrderStatus;
@@ -43,21 +44,23 @@ public class OrderController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<Map<String, String>> newOrder(
-            @RequestBody @Valid Map<String, Set<NewOrderDto>> newOrderDto,
-            @RequestHeader("Authorization") String authToken) {
+    public ResponseEntity<Map<String, String>> newOrder(@RequestBody @Valid NewOrderDto newOrderDto,
+            @RequestHeader("Authorization") String authToken) throws Exception {
         String userToken = jwtService.validateToken(authToken);
 
-        Set<NewOrderDto> dtoItems = newOrderDto.get("order");
+        Set<NewOrderItemsDto> dtoItems = newOrderDto.getOrder();
 
         FormatNewOrderDto formatOrderDto = new FormatNewOrderDto(dtoItems);
 
         formatOrderDto.insertItemsOnOrder();
 
-        this.orderService.newOrder(formatOrderDto.getOrder(), userToken);
+
+        this.orderService.newOrder(formatOrderDto.getOrder(), userToken,
+                newOrderDto.getCouponCode());
 
         return ResponseEntity.status(201)
                 .body(Collections.singletonMap("message", "Order created successfully!"));
+
     }
 
     @PatchMapping("/approve/{orderId}")

@@ -1,45 +1,29 @@
 package ecommerce.http.dtos.order;
 
-import org.hibernate.validator.constraints.UUID;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import java.util.Set;
 import jakarta.validation.constraints.NotNull;
 
 public class NewOrderDto {
-    @NotBlank(message = "productId can't be empty")
-    @NotNull(message = "productId can't be null")
-    @UUID(message = "productId must be an valid UUID")
-    private String productId;
+    private String couponCode;
 
-    @NotBlank(message = "skuId can't be empty")
-    @NotNull(message = "skuId can't be null")
-    @UUID(message = "skuId must be an valid UUID")
-    private String skuId;
+    @NotNull(message = "order can't be null.")
+    private Set<NewOrderItemsDto> order;
 
-    @Min(value = 1, message = "quantity must be at least 1.")
-    private Integer quantity;
+    public NewOrderDto() {}
 
-    public String getProductId() {
-        return productId;
+    public String getCouponCode() {
+        return couponCode;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
     }
 
-    public String getSkuId() {
-        return skuId;
+    public Set<NewOrderItemsDto> getOrder() {
+        return order;
     }
 
-    public void setSkuId(String skuId) {
-        this.skuId = skuId;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    public void setOrder(Set<NewOrderItemsDto> order) {
+        this.order = order;
     }
 }

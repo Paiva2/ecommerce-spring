@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import ecommerce.http.entities.Client;
+import ecommerce.http.entities.Coupon;
 import ecommerce.http.entities.Order;
 import ecommerce.http.entities.OrderItem;
 import ecommerce.http.entities.ProductSku;
@@ -25,6 +26,7 @@ import ecommerce.http.exceptions.NotFoundException;
 import ecommerce.http.exceptions.PaymentRequiredException;
 
 import ecommerce.http.repositories.ClientRepository;
+import ecommerce.http.repositories.CouponRepository;
 import ecommerce.http.repositories.OrderItemRepository;
 import ecommerce.http.repositories.OrderRepository;
 import ecommerce.http.repositories.ProductSkuRepository;
@@ -51,19 +53,24 @@ public class OrderService {
     @Autowired
     private final WalletService walletService;
 
+    @Autowired
+    private final CouponRepository couponRepository;
+
     public OrderService(OrderRepository orderRepository, ClientRepository clientRepository,
             OrderItemRepository orderItemRepository, OrderItemService orderItemService,
-            ProductSkuRepository productSkuRepository, WalletService walletService) {
+            ProductSkuRepository productSkuRepository, WalletService walletService,
+            CouponRepository couponRepository) {
         this.orderRepository = orderRepository;
         this.clientRepository = clientRepository;
         this.orderItemRepository = orderItemRepository;
         this.orderItemService = orderItemService;
         this.productSkuRepository = productSkuRepository;
         this.walletService = walletService;
+        this.couponRepository = couponRepository;
     }
 
     @Transactional(noRollbackFor = PaymentRequiredException.class)
-    public Order newOrder(Order order, String clientId) {
+    public Order newOrder(Order order, String clientId, String couponCode) throws Exception {
         if (order == null) {
             throw new BadRequestException("Invalid order.");
         }
@@ -97,6 +104,33 @@ public class OrderService {
 
         BigDecimal orderTotal = new BigDecimal(order.getTotal().toString());
 
+        Boolean orderHasCoupon = couponCode != null;
+
+        if (orderHasCoupon) {
+            Optional<Coupon> doesClientHasCoupon = orderClient.getCoupons().stream()
+                    .filter(coupon -> coupon.getCode().equals(couponCode)).findFirst();
+
+            if (doesClientHasCoupon.isEmpty()) {
+                throw new NotAllowedException("Coupon not found.");
+            }
+
+            Coupon couponTouse = doesClientHasCoupon.get();
+
+            Boolean isCouponValid = couponTouse.getActive() && couponTouse.isCouponValid();
+
+            if (!isCouponValid) {
+                throw new NotAllowedException("Coupon has expired or is not active.");
+            }
+
+            BigDecimal discount = (orderTotal.multiply(BigDecimal.valueOf(couponTouse.getValue())))
+                    .divide(BigDecimal.valueOf(100));
+
+            order.subtractTotal(discount);
+
+            this.couponRepository.disableCoupon(couponTouse.getId());
+        }
+
+        order.setHasUsedCoupon(orderHasCoupon);
         Boolean userHasNecessaryAmount = userWalletAmount.compareTo(orderTotal) >= 0;
 
         OrderStatus orderStatus =
@@ -114,8 +148,8 @@ public class OrderService {
         }
 
         if (performOrderCreation != null) {
-            this.walletService.handleAmount(orderTotal, orderClient.getWallet().getId(), "subtract",
-                    null);
+            this.walletService.handleAmount(order.getTotal(), orderClient.getWallet().getId(),
+                    "subtract", null);
         }
 
         return performOrderCreation;

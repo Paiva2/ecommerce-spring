@@ -3,18 +3,18 @@ package ecommerce.http.dtos.order.utils;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import ecommerce.http.dtos.order.NewOrderDto;
+import ecommerce.http.dtos.order.NewOrderItemsDto;
 import ecommerce.http.entities.Order;
 import ecommerce.http.entities.OrderItem;
 
 public class FormatNewOrderDto {
     private Set<OrderItem> orderItems;
 
-    private Set<NewOrderDto> dtoItems;
+    private Set<NewOrderItemsDto> dtoItems;
 
     private Order newOrder;
 
-    public FormatNewOrderDto(Set<NewOrderDto> dtoItems) {
+    public FormatNewOrderDto(Set<NewOrderItemsDto> dtoItems) {
         this.dtoItems = dtoItems;
         this.newOrder = new Order();
         this.orderItems = new HashSet<>();

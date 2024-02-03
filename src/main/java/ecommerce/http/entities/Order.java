@@ -47,6 +47,9 @@ public class Order {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "has_used_coupon")
+    private Boolean hasUsedCoupon;
+
     @JsonIgnore
     @ManyToOne(targetEntity = Client.class, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "order_owner_id")
@@ -116,5 +119,17 @@ public class Order {
 
     public void incrementTotal(BigDecimal amount) {
         this.total = this.total.add(amount);
+    }
+
+    public void subtractTotal(BigDecimal amount) {
+        setTotal(this.total.subtract(amount));
+    }
+
+    public Boolean getHasUsedCoupon() {
+        return hasUsedCoupon;
+    }
+
+    public void setHasUsedCoupon(Boolean hasUsedCoupon) {
+        this.hasUsedCoupon = hasUsedCoupon;
     }
 }
