@@ -3,6 +3,7 @@ package ecommerce.http.controllers.coupon;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ecommerce.http.dtos.coupon.GiveClientCouponDto;
+import ecommerce.http.dtos.coupon.UpdateCouponInfosDto;
 import ecommerce.http.entities.Coupon;
 import ecommerce.http.services.coupon.CouponService;
 
@@ -32,5 +34,16 @@ public class CouponController {
         Coupon newCoupon = this.couponService.createCoupon(giveClientCouponDto.toCoupon(), userId);
 
         return ResponseEntity.status(201).body(newCoupon);
+    }
+
+    @PatchMapping("/update/{couponId}")
+    public ResponseEntity<Coupon> updateCouponInfos(
+            @RequestBody @Valid UpdateCouponInfosDto updateCouponInfosDto,
+            @PathVariable(name = "couponId", required = true) UUID couponId) {
+
+        updateCouponInfosDto.setId(couponId);
+        Coupon couponUpdated = this.couponService.updateCoupon(updateCouponInfosDto.toCoupon());
+
+        return ResponseEntity.ok().body(couponUpdated);
     }
 }

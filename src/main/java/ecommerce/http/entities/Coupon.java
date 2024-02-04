@@ -129,6 +129,7 @@ public class Coupon {
         this.code = code;
     }
 
+    @JsonIgnore
     public Boolean isCouponValid() throws Exception {
         LocalDateTime couponDateTime = LocalDateTime.parse(this.validUntil);
         Instant couponInstant = couponDateTime.atZone(ZoneId.systemDefault()).toInstant();

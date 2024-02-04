@@ -1,8 +1,10 @@
 package ecommerce.http.services.coupon;
 
+import java.beans.PropertyDescriptor;
 import java.util.Optional;
 import java.util.UUID;
-
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,5 +51,43 @@ public class CouponService {
         Coupon newCoupon = this.couponRepository.save(coupon);
 
         return newCoupon;
+    }
+
+    public Coupon updateCoupon(Coupon coupon) {
+        if (coupon == null) {
+            throw new BadRequestException("Invalid coupon.");
+        }
+
+        if (coupon.getId() == null) {
+            throw new BadRequestException("Invalid coupon id.");
+        }
+
+        Optional<Coupon> getCoupon = this.couponRepository.findById(coupon.getId());
+
+        if (getCoupon.isEmpty()) {
+            throw new NotFoundException("Coupon not found.");
+        }
+
+        BeanWrapper sourceCoupon = new BeanWrapperImpl(getCoupon.get());
+        BeanWrapper targetEdit = new BeanWrapperImpl(coupon);
+
+        PropertyDescriptor[] fieldsToEdit = targetEdit.getPropertyDescriptors();
+
+        for (PropertyDescriptor field : fieldsToEdit) {
+            String fieldName = field.getName();
+            Object fieldValue = targetEdit.getPropertyValue(fieldName);
+
+            Boolean canUpdate = fieldName.hashCode() != "class".hashCode()
+                    && fieldName.hashCode() != "id".hashCode() && fieldValue != null;
+            System.out.println(fieldValue);
+
+            if (canUpdate) {
+                sourceCoupon.setPropertyValue(fieldName, fieldValue);
+            }
+        }
+
+        Coupon performCouponUpdate = this.couponRepository.save(getCoupon.get());
+
+        return performCouponUpdate;
     }
 }
