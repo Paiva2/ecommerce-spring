@@ -3,12 +3,15 @@ package ecommerce.http.controllers.product;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import ecommerce.http.dtos.product.InsertNewProductDto;
 import ecommerce.http.dtos.product.UpdateProductDto;
 import ecommerce.http.entities.Product;
 import ecommerce.http.services.product.ProductService;
+
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;

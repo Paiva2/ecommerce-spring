@@ -25,24 +25,16 @@ import java.util.UUID;
 public class ProductService {
 
     @Autowired
-    private final ProductRepositoryCustom productRepositoryCustom;
+    private ProductRepositoryCustom productRepositoryCustom;
 
     @Autowired
-    private final ProductRepository repository;
+    private ProductRepository repository;
 
     @Autowired
-    private final CategoryService categoryService;
+    private CategoryService categoryService;
 
     @Autowired
-    private final ProductSkuService productSkuService;
-
-    public ProductService(ProductRepository productRepository, CategoryService categoryService,
-            ProductSkuService productSkuService, ProductRepositoryCustom productRepositoryCustom) {
-        this.repository = productRepository;
-        this.categoryService = categoryService;
-        this.productSkuService = productSkuService;
-        this.productRepositoryCustom = productRepositoryCustom;
-    }
+    private ProductSkuService productSkuService;
 
     public Product insertProduct(Product newProduct) {
         if (newProduct == null) {

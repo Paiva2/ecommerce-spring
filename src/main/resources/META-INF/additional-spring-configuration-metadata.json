@@ -1,5 +1,19 @@
-{"properties": [{
-  "name": "api.security.token.secret",
-  "type": "java.lang.String",
-  "description": "A description for 'api.security.token.secret'"
-}]}
+{
+  "properties": [
+    {
+      "name": "api.security.token.secret",
+      "type": "java.lang.String",
+      "description": "A description for 'api.security.token.secret'"
+    },
+    {
+      "name": "rabbit.queue.name",
+      "type": "java.lang.String",
+      "description": "A description for 'rabbit.queue.name'"
+    },
+    {
+      "name": "rabbit.topic.name",
+      "type": "java.lang.String",
+      "description": "A description for 'rabbit.topic.name'"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ package ecommerce.http.entities;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;

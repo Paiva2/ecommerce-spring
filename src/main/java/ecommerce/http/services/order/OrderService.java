@@ -11,9 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-
+import ecommerce.http.config.lib.rabbitMQ.SendMessages;
 import ecommerce.http.entities.Client;
 import ecommerce.http.entities.Coupon;
+import ecommerce.http.entities.Email;
 import ecommerce.http.entities.Order;
 import ecommerce.http.entities.OrderItem;
 import ecommerce.http.entities.ProductSku;
@@ -36,38 +37,28 @@ import ecommerce.http.services.wallet.WalletService;
 @Service
 public class OrderService {
     @Autowired
-    private final OrderRepository orderRepository;
+    private OrderRepository orderRepository;
 
     @Autowired
-    private final ClientRepository clientRepository;
+    private ClientRepository clientRepository;
 
     @Autowired
-    private final OrderItemRepository orderItemRepository;
+    private OrderItemRepository orderItemRepository;
 
     @Autowired
-    private final OrderItemService orderItemService;
+    private OrderItemService orderItemService;
 
     @Autowired
-    private final ProductSkuRepository productSkuRepository;
+    private ProductSkuRepository productSkuRepository;
 
     @Autowired
-    private final WalletService walletService;
+    private WalletService walletService;
 
     @Autowired
-    private final CouponRepository couponRepository;
+    private CouponRepository couponRepository;
 
-    public OrderService(OrderRepository orderRepository, ClientRepository clientRepository,
-            OrderItemRepository orderItemRepository, OrderItemService orderItemService,
-            ProductSkuRepository productSkuRepository, WalletService walletService,
-            CouponRepository couponRepository) {
-        this.orderRepository = orderRepository;
-        this.clientRepository = clientRepository;
-        this.orderItemRepository = orderItemRepository;
-        this.orderItemService = orderItemService;
-        this.productSkuRepository = productSkuRepository;
-        this.walletService = walletService;
-        this.couponRepository = couponRepository;
-    }
+    @Autowired
+    private SendMessages sendMailMessage;
 
     @Transactional(noRollbackFor = PaymentRequiredException.class)
     public Order newOrder(Order order, String clientId, String couponCode) throws Exception {
@@ -142,6 +133,12 @@ public class OrderService {
 
         this.orderItemRepository.saveAll(allOrderItems);
 
+        Email refundEmail = new Email(order.getClient().getEmail(), order.getClient().getName());
+
+        refundEmail.handleOrderBuilder(userHasNecessaryAmount, order.getId());
+
+        sendMailMessage.send(refundEmail);
+
         if (!userHasNecessaryAmount) {
             throw new PaymentRequiredException(
                     "Insufficient amount. Order status will be pending.");
@@ -201,6 +198,13 @@ public class OrderService {
 
         this.walletService.handleAmount(orderToHandle.getTotal(),
                 getOrderOwner.get().getWallet().getId(), "subtract", null);
+
+        Email approveOrderEmail = new Email(orderToHandle.getClient().getEmail(),
+                orderToHandle.getClient().getName());
+
+        approveOrderEmail.handleOrderApprovalBuilder(true, orderToHandle.getId());
+
+        sendMailMessage.send(approveOrderEmail);
     }
 
     @Transactional
@@ -237,6 +241,13 @@ public class OrderService {
         orderToHandle.setStatus(OrderStatus.CANCELLED);
 
         this.productSkuRepository.saveAll(itemsList);
+
+        Email approveOrderEmail = new Email(orderToHandle.getClient().getEmail(),
+                orderToHandle.getClient().getName());
+
+        approveOrderEmail.handleOrderApprovalBuilder(false, orderToHandle.getId());
+
+        sendMailMessage.send(approveOrderEmail);
     }
 
     public Page<Order> ListAllOrders(Integer page, Integer perPage, OrderStatus status) {
@@ -314,5 +325,10 @@ public class OrderService {
         order.setStatus(defineStatus);
 
         this.orderRepository.save(order);
+
+        Email refundEmail = new Email(order.getClient().getEmail(), order.getClient().getName());
+
+        refundEmail.handleRefundBuilder(willApprove);
+        sendMailMessage.send(refundEmail);
     }
 }

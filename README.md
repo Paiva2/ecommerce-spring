@@ -18,7 +18,7 @@ Java-based application built using the Spring framework. The system is designed 
 - [x] Perform Wallet transactions with products and orders.
 - [x] Manage your own orders.
 - [x] Manage your owns coupons.
-- [ ] Send user email after a purchase.
+- [x] Send user email after a purchase, register, refund, or order cancelled (e-mail microservice).
 - [x] All entities validations.
 
 ### Admin (Shop)
@@ -27,7 +27,7 @@ Java-based application built using the Spring framework. The system is designed 
 - [x] It must be possible to insert a new SKU to an product.
 - [x] It must be possible to perform CRUD operations in a category.
 - [x] It must be possible to filter products with dynamic queries such as active, category, name, color, sizes, gender etc.
-- [ ] It must be possible to perform CRUD operations in coupons.
+- [x] It must be possible to perform CRUD operations in coupons.
 - [x] List all orders already made.
 - [x] Give an determined amount to an user wallet.
 - [x] Give users coupons to use.
@@ -42,3 +42,5 @@ Java-based application built using the Spring framework. The system is designed 
 - Postgres
 - Docker
 - Hibernate
+- RabbitMQ
+- Microservice for e-mail handling (https://github.com/Paiva2/mail-service)

@@ -21,21 +21,13 @@ import ecommerce.http.repositories.ProductSkuRepository;
 @Service
 public class OrderItemService {
     @Autowired
-    private final ProductRepository productRepository;
+    private ProductRepository productRepository;
 
     @Autowired
-    private final OrderItemRepository orderItemRepository;
+    private OrderItemRepository orderItemRepository;
 
     @Autowired
-    private final ProductSkuRepository productSkuRepository;
-
-    public OrderItemService(ProductRepository productRepository,
-            OrderItemRepository orderItemRepository, ProductSkuRepository productSkuRepository) {
-        this.productRepository = productRepository;
-        this.orderItemRepository = orderItemRepository;
-        this.productSkuRepository = productSkuRepository;
-
-    }
+    private ProductSkuRepository productSkuRepository;
 
     public OrderItem newOrderItem(Order order, OrderItem orderItem, Set<ProductSku> orderSkuList) {
         if (order == null || orderItem.getProductId() == null) {

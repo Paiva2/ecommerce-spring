@@ -11,11 +11,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ecommerce.http.repositories.ClientRepository;
 import ecommerce.http.repositories.OrderRepository;
 import ecommerce.http.services.wallet.WalletService;
-
+import ecommerce.http.config.lib.rabbitMQ.SendMessages;
 import ecommerce.http.entities.Client;
 import ecommerce.http.entities.ClientWallet;
 import ecommerce.http.entities.Coupon;
 import ecommerce.http.entities.Order;
+import ecommerce.http.entities.Email;
 
 import ecommerce.http.enums.OrderStatus;
 
@@ -25,10 +26,10 @@ import ecommerce.http.exceptions.ForbiddenException;
 import ecommerce.http.exceptions.NotAllowedException;
 import ecommerce.http.exceptions.NotFoundException;
 
+import java.beans.PropertyDescriptor;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import java.beans.PropertyDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -36,22 +37,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClientService {
     @Autowired
-    private final ClientRepository repository;
+    private ClientRepository repository;
 
     @Autowired
-    private final WalletService walletService;
+    private WalletService walletService;
 
     @Autowired
-    private final OrderRepository orderRepository;
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private SendMessages sendMailMessage;
 
     private final BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder(6);
-
-    public ClientService(ClientRepository repository, WalletService walletService,
-            OrderRepository orderRepository) {
-        this.repository = repository;
-        this.walletService = walletService;
-        this.orderRepository = orderRepository;
-    }
 
     public Client auth(Client client) {
         if (client == null) {
@@ -93,6 +90,11 @@ public class ClientService {
 
         Client createdClient = this.repository.save(client);
 
+        Email registerEmail = new Email(client.getEmail(), client.getName());
+        registerEmail.registerBuilder();
+
+        sendMailMessage.send(registerEmail);
+
         return createdClient;
     }
 
@@ -127,6 +129,11 @@ public class ClientService {
         if (userUpdated < 1) {
             throw new NotFoundException("User not found.");
         }
+
+        Email forgotPasswordEmail = new Email(client.getEmail(), doesClientExists.get().getName());
+        forgotPasswordEmail.forgotPasswordBuilder();
+
+        sendMailMessage.send(forgotPasswordEmail);
     }
 
     public Map<String, Object> getProfile(String clientId) {
@@ -310,6 +317,11 @@ public class ClientService {
         order.setStatus(OrderStatus.PENDING_REFUND);
 
         this.orderRepository.save(order);
+
+        Email refundEmail = new Email(order.getClient().getEmail(), order.getClient().getName());
+        refundEmail.requestRefundBuilder();
+
+        sendMailMessage.send(refundEmail);
     }
 
     public Set<Coupon> listCoupons(UUID userId) {

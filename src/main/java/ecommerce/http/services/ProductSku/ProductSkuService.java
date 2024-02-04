@@ -21,16 +21,10 @@ import ecommerce.http.repositories.ProductSkuRepository;
 @Service
 public class ProductSkuService {
     @Autowired
-    private final ProductSkuRepository productSkuRepository;
+    private ProductSkuRepository productSkuRepository;
 
     @Autowired
-    private final ProductRepository productRepository;
-
-    public ProductSkuService(ProductSkuRepository productSkuRepository,
-            ProductRepository productRepository) {
-        this.productSkuRepository = productSkuRepository;
-        this.productRepository = productRepository;
-    }
+    private ProductRepository productRepository;
 
     public ProductSku insertNewSku(ProductSku newSku) {
         if (newSku.getProduct().getId() == null) {

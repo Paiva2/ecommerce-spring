@@ -18,7 +18,6 @@ import ecommerce.http.services.client.ClientService;
 import ecommerce.http.services.jwt.JwtService;
 
 import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;

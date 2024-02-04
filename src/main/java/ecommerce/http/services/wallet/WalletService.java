@@ -18,11 +18,7 @@ public class WalletService {
     protected final BigDecimal INITIAL_AMOUNT = BigDecimal.valueOf(2000.00);
 
     @Autowired
-    private final WalletRepository walletRepository;
-
-    public WalletService(WalletRepository walletRepository) {
-        this.walletRepository = walletRepository;
-    }
+    private WalletRepository walletRepository;
 
     public ClientWallet generateWallet(Client walletOwner) {
         ClientWallet wallet = new ClientWallet();
