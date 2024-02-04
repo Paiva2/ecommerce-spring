@@ -1,4 +1,4 @@
-# E-commerce system - In progress
+# E-commerce system
 
 Java-based application built using the Spring framework. The system is designed to cater to both clients and administrators, providing a range of features to facilitate smooth e-commerce operations in a basic way.
 
